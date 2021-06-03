@@ -58,7 +58,7 @@ http://robertsonics.com/2015/04/25/arduino-serial-control-tutorial/
 https://github.com/robertsonics/WAV-Trigger-Arduino-Serial-Library
 
 --------------------
-## Device diagram
+## Device pradigm
 
 1. Start streaming using python (LSL) > EEG acquisition start 
 2. Start Experiment using psychopy
