@@ -60,15 +60,15 @@ https://github.com/robertsonics/WAV-Trigger-Arduino-Serial-Library
 --------------------
 ## Device Pradigm
 
-1. Start streaming using python (LSL) > EEG acquisition start 
-2. Start Experiment using psychopy
-3. Send signal for sound onset to Arduino through Serial Port [ 1. line ]
-4. play sound from WAV Trigger through arduino ( generate jitter ) [ 2. line ]
-5. Flow Sound through earphon to subject and analog signal of sound to arduino [ 3. line ]
-6. Detect sound onset timing in arduino by analog signal of sound [ 4. line ]
-7. Send tigger about sound onset to Cyton + daisy [ 5. line ]
-8. Send EEG data and Trigger to desktop, be received and recorded by python. [ 6. line ]
-9. ~ 
+1. Start streaming with Python. (LSL) > EEG acquisition start 
+2. Start Experiment with Psychopy.
+3. Sends the signal of sound onset to Arduino via the Serial Port. [ 1. line ]
+4. Play sound from WAV Trigger via Arduino ( generated jitter ) and send Triggers on sound onset. [ 2. line ]
+5. Sound flows through earphone to subject and analog signals of sound are sent to Arduino at the same time. [ 3. line ]
+6. Detect sound onset timing in Arduino by analog signals of sound. [ 4. line ]
+7. Sends the tigger for the sound onset to Cyton + daisy ( No jitter ). [ 5. line ]
+8. Sends EEG data and Trigger to the desktop, received and recorded them by python. [ 6. line ]
+
 
 
 ![제목 없는 프레젠테이션](https://user-images.githubusercontent.com/85104167/120435956-4b9eda80-c3b9-11eb-9f6c-0167660a8a2e.jpg)
