@@ -8,44 +8,82 @@
 #================================== SET EXPERIMENT ================================================#
 
 ###### Imports #####
-import librosa, warnings, random, time, os, sys, serial
+import librosa, warnings, random, time, os, sys, serial, logging, argparse, mne
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from pylsl import StreamInlet, resolve_stream, StreamInfo
-from OpenBCI_lsl import *
+#from OpenBCI_lsl import *
 from scipy import signal
 from scipy.signal import butter, lfilter, resample, filtfilt
-from helper import *
+#from helper import *
 from pymtrf import *
 from psychopy import visual, core, event
 from preprocessing_ha import *
+from brainflow.board_shim import BoardShim, BrainFlowInputParams, BoardIds, BrainFlowError
+from brainflow.data_filter import DataFilter, FilterTypes, AggOperations, WindowFunctions, DetrendOperations
 
 
 #----------------------------- Load Speech segment data ------------------------------#
 
-stim_L = np.load('C:/Users/user/Desktop/hy-kist/OpenBCI/save_data/Stim_seg_L.npy')   ## 30*46*960 numpy array
-stim_R = np.load('C:/Users/user/Desktop/hy-kist/OpenBCI/save_data/Stim_seg_R.npy')   ## 30*46*960 numpy array
+stim_L = np.load('C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/AAK/ORIGINAL_SPEECH/Stim_seg_L.npy')   ## 30*46*960 numpy array
+stim_R = np.load('C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/AAK/ORIGINAL_SPEECH/Stim_seg_R.npy')   ## 30*46*960 numpy array
 
+
+# kist : 'C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/AAK/ORIGINAL_SPEECH/'
+# hyu : 'C:/Users/user/Desktop/hy-kist/OpenBCI/save_data/'
 
 #----------------------------- Connect to port of arduino ------------------------------#
 
-port = serial.Serial("COM10", 9600)
+port = serial.Serial("COM8", 9600)
 
+# kist - COM8
+#----------------------------- Open Brainflow network -----------------------------#
 
-#----------------------------- Open LSL network -----------------------------#
+BoardShim.enable_dev_board_logger()
 
-# first resolve an EEG stream on the lab network
-print("looking for an EEG stream...")
-streams_eeg = resolve_stream('type', 'EEG')
-streams_aux = resolve_stream('type', 'AUX')
+parser = argparse.ArgumentParser()
+# use docs to check which parameters are required for specific board, e.g. for Cyton - set serial port
+parser.add_argument('--timeout', type=int, help='timeout for device discovery or connection', required=False,
+                    default=0)
+parser.add_argument('--ip-port', type=int, help='ip port', required=False, default=0)
+parser.add_argument('--ip-protocol', type=int, help='ip protocol, check IpProtocolType enum', required=False,
+                    default=0)
+parser.add_argument('--ip-address', type=str, help='ip address', required=False, default='')
+parser.add_argument('--serial-port', type=str, help='serial port', required=False, default='COM7')      # kist : COM7 / hy: COM15
+parser.add_argument('--mac-address', type=str, help='mac address', required=False, default='')
+parser.add_argument('--other-info', type=str, help='other info', required=False, default='')
+parser.add_argument('--streamer-params', type=str, help='streamer params', required=False, default='')
+parser.add_argument('--serial-number', type=str, help='serial number', required=False, default='')
+parser.add_argument('--board-id', type=int, help='board id, check docs to get a list of supported boards',
+                    required=False, default='2')
+parser.add_argument('--file', type=str, help='file', required=False, default='')
+args = parser.parse_args()
 
+params = BrainFlowInputParams()
+BoardShim.enable_dev_board_logger()
+params.ip_port = args.ip_port
+params.serial_port = args.serial_port
+params.mac_address = args.mac_address
+params.other_info = args.other_info
+params.serial_number = args.serial_number
+params.ip_address = args.ip_address
+params.ip_protocol = args.ip_protocol
+params.timeout = args.timeout
+params.file = args.file
 
-# create a new inlet to read from the stream
-print("StreamInlet")
-inlet_eeg = StreamInlet(streams_eeg[0], 360, 125)    # channel
-inlet_aux = StreamInlet(streams_aux[0])            # aux
+board = BoardShim(args.board_id, params)
+board.prepare_session()
 
+# board.start_stream () # use this for default options
+board.start_stream(45000, args.streamer_params)
+time.sleep(10)
+#data = board.get_current_board_data (125) # get latest 256 packages or less, doesnt remove them from internal buffer
+input = board.get_board_data()
+
+# Set channels number
+eeg_channels = board.get_eeg_channels(args.board_id)
+aux_channels = board.get_analog_channels(args.board_id)
 
 #----------------------------- Parameter Setting -----------------------------#
 
@@ -67,12 +105,20 @@ inter_w = []
 entr_L =[]
 entr_R = []
 EEG = []
+AUX = []
 tr = 0
 start = []
 end = []
 w = 1
 s = 0
+temp=[]
 
+eeg_record = np.zeros((16,1))
+aux_record = np.zeros((3,1))
+eeg_data = np.array([])
+temp=np.zeros((16,1))
+w = 1
+num = 1
 #----------------------------- Make the window for Psychopy -----------------------------#
 
 screen = visual.Window([960, 900],
@@ -83,14 +129,14 @@ screen = visual.Window([960, 900],
     allowGUI = False,
     allowStencil = False,
     monitor ='testMonitor',
-    color = [1,1,1],
+    color = [-1,-1,-1],
     blendMode = 'avg',
     units = 'pix'
     #pos = [100,0]
                     )
 
 # Set Text_1 - Start
-text = visual.TextStim(screen, text=" + ", height=100, color=[-1, -1, -1])
+text = visual.TextStim(screen, text=" + ", height=100, color=[1, 1, 1])
 
 # Draw text
 text.draw()
@@ -101,14 +147,12 @@ screen.flip()
 #==================================================================================================#
 
 ##### Start 30 trial #####
-while tr < 30:   # 30
+while tr < 1:   # 30
 
     #inlet_eeg = StreamInlet(streams_eeg[0], 360, 125)  # channel
     #inlet_aux = StreamInlet(streams_aux[0])
 
-    # Trigger detection
-    [sample_aux, ts_aux] = inlet_aux.pull_sample()
-    print("{0}".format(sample_aux))
+#------------ Each trial
 
 #----------------------------- Psychopy Window & Serial Write ------------------------------#
 
@@ -120,7 +164,7 @@ while tr < 30:   # 30
         port.write(b'1')
 
         # Set Text_2
-        text2 = visual.TextStim(screen, text="<<<<", height=80, color=[-1, -1, -1])
+        text2 = visual.TextStim(screen, text="<<<<", height=80, color=[1, 1, 1])
         # Draw text
         text2.draw()
         screen.flip()
@@ -129,48 +173,60 @@ while tr < 30:   # 30
     elif tr > 0 and w == 1 :
 
         # Set Text_1 - Start
-        text = visual.TextStim(screen, text=" + ", height=100, color=[-1, -1, -1])
+        text = visual.TextStim(screen, text=" + ", height=100, color=[1, 1, 1])
 
         # Draw text
         text.draw()
         screen.flip()
 
+        [sample_aux, ts_aux] = inlet_aux.pull_sample()
+        print("wait")
         time.sleep(3)
 
         # Send signal to arduino for start sound
         port.write(b'1')
 
         # Set Text_2
-        text2 = visual.TextStim(screen, text="<<<<", height=80, color=[-1, -1, -1])
+        text2 = visual.TextStim(screen, text="<<<<", height=80, color=[1, 1, 1])
         # Draw text
         text2.draw()
         screen.flip()
         w = 0
 
-    [sample_aux, ts_aux] = inlet_aux.pull_sample()
-    print("{0}".format(sample_aux))
+        #reset
+        eeg_record = np.zeros((16,1))
+        aux_record = np.zeros((3,1))
+
+    # Trigger detection
+    input = board.get_board_data()
+    eeg_data = input[eeg_channels, :]
+    aux_data = input[aux_channels, :]
+    eeg_record = np.concatenate((eeg_record, eeg_data), axis=1)
+    aux_record = np.concatenate((aux_record, aux_data), axis=1)
+    print(aux_data)
 
 #----------------------------- Trigger detection -----------------------------#
-
-    if sample_aux[1] > 3.14 and s == 1:
+# per trial
+    if 1 in aux_data[1,:]:
 
         print("Input Trigger {0}".format(tr))
 
-        # Wait beep sound
-        time.sleep(3)
-
         print("Start Speech")
 
+        # Find onset point
+        index = np.where(aux_record[1,:]==1)     # Onset 지점!
+        onset = index[0][0]
+
         # Format per trial
-        eeg_record = np.array([])
+        #eeg_record = np.array([])
         i = 0
         work = 1
-        eeg = []
 
 
 #----------------------------- Working while 60s -----------------------------#
-
-        while len(eeg_record.T) != 7500:
+        # onset 부터 3초 지나고 원하는 시간(한 trial) 동안 돌아가도록
+        speech = onset + (srate*3)
+        while len(eeg_record.T) < (speech + srate*60):
 
             if work > 1:
                 work = 1
@@ -179,46 +235,35 @@ while tr < 30:   # 30
 
             start = time.perf_counter()
 
-            # receive sample per 1s
+            # Receive sample
+            input = board.get_board_data()
+            eeg_data = input[eeg_channels, :]
+            aux_data = input[aux_channels, :]                 # 11,12,13 / 0 or 1
+            eeg_record = np.concatenate((eeg_record, eeg_data), axis=1)     # channel by time
+            aux_record = np.concatenate((aux_record, aux_data), axis=1)
 
-            [sample_eeg, ts_eeg] = inlet_eeg.pull_chunk(0, 125)
-
-            # To prevent to precess with empty samples
-            if sample_eeg:
-
-                eeg = eeg + sample_eeg   # list - a number of samples
-
-                if len(sample_eeg) < 125:
-                    sample = sample.expend(sample, 0, (125-len(sample_eeg)))
 
             end = time.perf_counter()
             work = end - start
 
 
             # Stack samples until 15s and window sliding per 1s
-            if len(eeg) >= srate * (i+15):
-
-                eeg_record = np.asarray(eeg).T    # channel by sample
-
-                # zero padding for lack of sample
-                if len(sample_eeg) < 125:
-
-                    eeg_record = np.pad(eeg_record,((0,0),(0,(i+15)*srate-len(eeg_record.T))), 'constant', constant_values = 0)  # 16 by 1875
+            if len(eeg_record.T) >= (speech + srate * (i+15)):
 
                 # Adjust the window length to match the seconds
-                win = eeg_record[:, round(i * srate):(i+15)*srate]
+                win = eeg_record[:, speech + srate*(i) : speech + srate*(i+15)]
+                trig = aux_record[:, speech + srate*(i) : speech + srate*(i+15)]
+
 
                 # Check print
                 print("Window number : {0}".format(i))
-                print("Time Check : {0}s".format(len(eeg_record.T) / srate))
+                print("Time Check : {0}s".format(len((eeg_record.T)-speech) / srate))
 
 
 #----------------------------- Pre-processing -----------------------------#
                 # preprocessing_ha.py
 
                 win = Preproccessing(win, srate, 0.5, 8, 3)  # data, sampling rate, low-cut, high-cut, filt order
-
-
 
 #------------------------------- Train set -------------------------------#
                 if tr < 14:  #int train
@@ -301,6 +346,7 @@ while tr < 30:   # 30
 
         # Stack eeg_record per trial
         EEG.append(eeg_record)
+        AUX.append(aux_record)
 
         ###### The things that have to calculate per trial ######
         ## Add model_w case train

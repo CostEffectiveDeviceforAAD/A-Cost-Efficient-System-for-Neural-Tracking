@@ -13,10 +13,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 from pylsl import StreamInlet, resolve_stream, StreamInfo
-from OpenBCI_lsl import *
+#from OpenBCI_lsl import *
 from scipy import signal
 from scipy.signal import butter, lfilter, resample, filtfilt
-from helper import *
+#from helper import *
 from pymtrf import *
 from psychopy import visual, core, event
 from preprocessing_ha import *
@@ -24,15 +24,18 @@ from preprocessing_ha import *
 
 #----------------------------- Load Speech segment data ------------------------------#
 
-stim_L = np.load('C:/Users/user/Desktop/hy-kist/OpenBCI/save_data/Stim_seg_L.npy')   ## 30*46*960 numpy array
-stim_R = np.load('C:/Users/user/Desktop/hy-kist/OpenBCI/save_data/Stim_seg_R.npy')   ## 30*46*960 numpy array
+stim_L = np.load('C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/AAK/ORIGINAL_SPEECH/Stim_seg_L.npy')   ## 30*46*960 numpy array
+stim_R = np.load('C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/AAK/ORIGINAL_SPEECH/Stim_seg_R.npy')   ## 30*46*960 numpy array
 
+
+# kist : 'C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/AAK/ORIGINAL_SPEECH/'
+# hyu : 'C:/Users/user/Desktop/hy-kist/OpenBCI/save_data/'
 
 #----------------------------- Connect to port of arduino ------------------------------#
 
-port = serial.Serial("COM10", 9600)
+port = serial.Serial("COM8", 9600)
 
-
+# kist - COM8
 #----------------------------- Open LSL network -----------------------------#
 
 # first resolve an EEG stream on the lab network
@@ -83,14 +86,14 @@ screen = visual.Window([960, 900],
     allowGUI = False,
     allowStencil = False,
     monitor ='testMonitor',
-    color = [1,1,1],
+    color = [-1,-1,-1],
     blendMode = 'avg',
     units = 'pix'
     #pos = [100,0]
                     )
 
 # Set Text_1 - Start
-text = visual.TextStim(screen, text=" + ", height=100, color=[-1, -1, -1])
+text = visual.TextStim(screen, text=" + ", height=100, color=[1, 1, 1])
 
 # Draw text
 text.draw()
@@ -120,7 +123,7 @@ while tr < 30:   # 30
         port.write(b'1')
 
         # Set Text_2
-        text2 = visual.TextStim(screen, text="<<<<", height=80, color=[-1, -1, -1])
+        text2 = visual.TextStim(screen, text="<<<<", height=80, color=[1, 1, 1])
         # Draw text
         text2.draw()
         screen.flip()
@@ -129,30 +132,33 @@ while tr < 30:   # 30
     elif tr > 0 and w == 1 :
 
         # Set Text_1 - Start
-        text = visual.TextStim(screen, text=" + ", height=100, color=[-1, -1, -1])
+        text = visual.TextStim(screen, text=" + ", height=100, color=[1, 1, 1])
 
         # Draw text
         text.draw()
         screen.flip()
 
+        [sample_aux, ts_aux] = inlet_aux.pull_sample()
+        print("wait")
         time.sleep(3)
 
         # Send signal to arduino for start sound
         port.write(b'1')
 
         # Set Text_2
-        text2 = visual.TextStim(screen, text="<<<<", height=80, color=[-1, -1, -1])
+        text2 = visual.TextStim(screen, text="<<<<", height=80, color=[1, 1, 1])
         # Draw text
         text2.draw()
         screen.flip()
         w = 0
 
     [sample_aux, ts_aux] = inlet_aux.pull_sample()
+    [sample_eeg, ts_eeg] = inlet_eeg.pull_chunk(0, 125)
     print("{0}".format(sample_aux))
 
 #----------------------------- Trigger detection -----------------------------#
 
-    if sample_aux[1] > 3.14 and s == 1:
+    if sample_aux[1] > 0 and s == 1:
 
         print("Input Trigger {0}".format(tr))
 
@@ -160,7 +166,7 @@ while tr < 30:   # 30
         time.sleep(3)
 
         print("Start Speech")
-
+        [sample_eeg, ts_eeg] = inlet_eeg.pull_chunk(0, 125)
         # Format per trial
         eeg_record = np.array([])
         i = 0
@@ -182,6 +188,7 @@ while tr < 30:   # 30
             # receive sample per 1s
 
             [sample_eeg, ts_eeg] = inlet_eeg.pull_chunk(0, 125)
+            [sample_aux, ts_aux] = inlet_aux.pull_sample()
 
             # To prevent to precess with empty samples
             if sample_eeg:
