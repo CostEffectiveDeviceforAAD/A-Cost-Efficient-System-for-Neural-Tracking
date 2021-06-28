@@ -13,10 +13,10 @@ void setup() {
 
   // Serial monitor
   Serial.begin(9600);
-  pinMode(13, OUTPUT);
-  pinMode(12, OUTPUT);
-  pinMode(11, OUTPUT);
-  
+  pinMode(13, OUTPUT);  // WAV Trigger onset
+  pinMode(12, OUTPUT);  // Real sound onset
+  pinMode(11, OUTPUT);  // sound LED
+  pinMode(10, OUTPUT);
   
   // If the Arduino is powering the WAV Trigger, we should wait for the WAV
   //  Trigger to finish reset before trying to send commands.
@@ -42,42 +42,40 @@ int track = 1;
 void loop() {
  
   digitalWrite(13, LOW);
-  digitalWrite(11, LOW);
+  digitalWrite(12, LOW);
+  digitalWrite(10, LOW);
   
+  int sound_L = analogRead(A0);
+  int sound_R = analogRead(A1);
+  Serial.println(sound_L);
+  delay(50);
+      
   // Trigger for start trial
   int input = Serial.read();
   if (input==49){  //int = 1 
 
     // start sound
     wTrig.trackPlaySolo(track);
-    // Trigger for just
-    digitalWrite(11, HIGH);
+    // Trigger for WAV onset
+    digitalWrite(13, HIGH);
           
     // Check LED (ouside)
-    digitalWrite(13,HIGH);
+    digitalWrite(10,HIGH);
     
     while(true) {    
 
       // Detect analog signal of sound(beep sound)
-      int sound = analogRead(A0);
+      int sound_L = analogRead(A0);
+      int sound_R = analogRead(A1);
+      Serial.println(sound_R);
       
-      if ( sound > 11 ) { // threshold =11
+      if ( sound_L > 28 || sound_R > 28) { // threshold =11 // 28
 
-        /*
-        ////////////// TEST //////////////////
-        for(int i = 0; i < 32; i++){
-          digitalWrite(11, LOW);
-          digitalWrite(12, HIGH);   // trigger for start speech!
-          delay(1000);
-          digitalWrite(11, HIGH);
-          digitalWrite(12, LOW);
-          delay(1000); }
-        ///////////////////////////////////////
-        */
-        digitalWrite(12,HIGH);
-        delay(60000);
-        digitalWrite(12,LOW);
-        
+        // Trigger for real sound onset
+        digitalWrite(12, HIGH);
+
+        // Play Wav file during 63s 
+        delay(63000);     
         
         // for next track
         track++;
