@@ -16,7 +16,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order):
 def Preproccessing(win,srate, low, high, order):
 
     #### Re-reference ####
-    for t in range(0, srate * 15):
+    for t in range(0, len(win.T)):
         re = np.mean(win[:, t])
         win[:, t] = win[:, t] - re
 
