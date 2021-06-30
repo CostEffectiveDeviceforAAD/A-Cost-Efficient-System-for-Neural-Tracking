@@ -1,4 +1,4 @@
-# Auditory BCI for real-time AAD
+# Auditory BCI for Online AAD
 
 This is Auditory BCI for Real-time Auditory Attention Detection(AAD).
 
