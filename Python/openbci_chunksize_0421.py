@@ -21,10 +21,6 @@ from pymtrf import *
 from psychopy import visual, core, event
 from preprocessing_ha import *
 
-## Start lsl from Terminal
-
-#os.system('yeah')
-
 
 #----------------------------- Load Speech segment data ------------------------------#
 
