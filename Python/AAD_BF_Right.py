@@ -27,13 +27,13 @@ from Brainflow_stream import *
 
 #----------------------------- Connect to port of arduino ------------------------------#
 
-port = serial.Serial("COM10", 9600)
+port = serial.Serial("COM8", 9600)
 
 # kist = COM8
 # hyu = COM10
 #----------------------------- Open Brainflow network -----------------------------#
 
-board, args = Brainflow_stream('COM15')       # kist : COM7 / hy: COM15
+board, args = Brainflow_stream('COM7')       # kist : COM7 / hy: COM15
 
 # Set channels number
 eeg_channels = board.get_eeg_channels(args.board_id)
@@ -43,13 +43,14 @@ srate = board.get_sampling_rate(args.board_id)
 
 
 #------------------------------------ Question ------------------------------------------------#
-path = 'C:/Users/user/Desktop/hy-kist/OpenBCI/Test/'
-# kist : C:/Users/LeeJiWon/Desktop/OpenBCI/save_data/
+path = 'C:/Users/LeeJiWon/Desktop/OpenBCI/save_data/'
+# kist : 'C:/Users/LeeJiWon/Desktop/OpenBCI/save_data/'
 # hyu : 'C:/Users/user/Desktop/hy-kist/OpenBCI/Test/'
 
-q = "C:/Users/user/Desktop/hy-kist/OpenBCI/AAD/Python/question.xlsx"
+q = "C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/Python/question.xlsx"
 
-# hy : "C:/Users/user/Desktop/hy-kist/OpenBCI/AAD/Python/question.xlsx"
+# hyu : "C:/Users/user/Desktop/hy-kist/OpenBCI/AAD/Python/question.xlsx"
+# kist : "C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/Python/question.xlsx"
 
 file = pd.read_excel(q)
 
@@ -114,7 +115,7 @@ def Question(j, file):
 #----------------------------- Load Speech segment data ------------------------------#
 
 # Load All speech
-allspeech = np.load('C:/Users/user/Desktop/hy-kist/OpenBCI/Sound data/AAK/ORIGINAL_SPEECH/Allspeech.npy')
+allspeech = np.load('C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/AAK/Allspeech.npy')
 # 60 by 3840  /1-30 : left by time / 31-60 righy by time // srat : 64
 
 stim_L = allspeech[:30, :]       # 30 by 3840   // trial by time
@@ -190,6 +191,7 @@ screen.flip()
 #==================================================================================================#
 
 #---------- Start 30 trial ----------#
+
 while tr < 30:   # 30
 
 #----------------------------- Psychopy Window & Serial Write ------------------------------#
@@ -202,8 +204,7 @@ while tr < 30:   # 30
         port.write(b'1')
 
         # Set Text_2
-        text2 = visual.TextStim(screen, text=">>>>", height=80, color=[1, 1, 1])
-        # Draw text
+        text2 = visual.TextStim(screen, text=">>>>", height=90, color=[1, 1, 1])
         text2.draw()
         screen.flip()
 
@@ -218,7 +219,7 @@ while tr < 30:   # 30
 
         # Interval
         time.sleep(3)
-        print("wait")
+        #print("wait")
 
         # Send signal to arduino for start sound
         port.write(b'1')
@@ -227,7 +228,6 @@ while tr < 30:   # 30
 
         # Set Text_2
         text2 = visual.TextStim(screen, text=">>>>", height=80, color=[1, 1, 1])
-        # Draw text
         text2.draw()
         screen.flip()
         w = 0
@@ -246,14 +246,14 @@ while tr < 30:   # 30
 
 #----------------------------- Trigger detection -----------------------------#
 # per trial
-    if 1 in aux_data[1,:]:      # if the trigger is entered at 12 pin, start precess. (include beep sound)
+    if 1 in aux_data[1,:]:      # if the trigger is entered at 12 pin, start process. (include beep sound)
 
         print("Input Trigger {0}".format(tr+1))
 
         print("Start Speech")
 
         # Find onset point
-        index = np.where(aux_record[1,:] != 0)     # Onset 지점찾기
+        index = np.where(aux_record[1,:] != 0)     # Find Onset index
         onset = index[0][0]
 
         # Format per trial
@@ -315,7 +315,7 @@ while tr < 30:   # 30
             #----------------------------- Pre-processing -----------------------------#
                 # preprocessing_ha.py
 
-                win = Preproccessing(win, srate, 0.5, 8, 3)  # data, sampling rate, low-cut, high-cut, filt order
+                win = Preproccessing(win, srate, 0.5, 8, 3)  # data, sampling rate, low-cut, high-cut, filter order
                 data_l = len(win.T)
 
             #------------------------------- Train set -------------------------------#
