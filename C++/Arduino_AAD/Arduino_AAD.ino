@@ -15,7 +15,7 @@ void setup() {
   Serial.begin(9600);
   pinMode(13, OUTPUT);  // WAV Trigger onset
   pinMode(12, OUTPUT);  // Real sound onset
-  pinMode(11, OUTPUT);  // sound LED
+  pinMode(11, OUTPUT);  // 
   pinMode(10, OUTPUT);
   
   // If the Arduino is powering the WAV Trigger, we should wait for the WAV
@@ -44,11 +44,13 @@ void loop() {
   digitalWrite(13, LOW);
   digitalWrite(12, LOW);
   digitalWrite(10, LOW);
-  
+
+  /*
   int sound_L = analogRead(A0);
   int sound_R = analogRead(A1);
-  Serial.println(sound_L);
-  delay(50);
+  Serial.println(sound_R);
+  */
+  
       
   // Trigger for start trial
   int input = Serial.read();
@@ -63,13 +65,14 @@ void loop() {
     digitalWrite(10,HIGH);
     
     while(true) {    
-
+      
       // Detect analog signal of sound(beep sound)
       int sound_L = analogRead(A0);
       int sound_R = analogRead(A1);
-      Serial.println(sound_R);
-      
-      if ( sound_L > 28 || sound_R > 28) { // threshold =11 // 28
+      //Serial.println(sound_R);
+
+
+      if ( sound_L > 20 || sound_R > 20) { // threshold =11 // 28
 
         // Trigger for real sound onset
         digitalWrite(12, HIGH);
