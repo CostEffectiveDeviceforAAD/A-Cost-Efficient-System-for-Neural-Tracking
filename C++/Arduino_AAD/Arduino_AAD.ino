@@ -40,7 +40,8 @@ int input = 0;
 int track = 1;
 
 void loop() {
- 
+
+  wTrig.stopAllTracks();
   digitalWrite(13, LOW);
   digitalWrite(12, LOW);
   digitalWrite(10, LOW);
@@ -72,7 +73,7 @@ void loop() {
       //Serial.println(sound_R);
 
 
-      if ( sound_L > 20 || sound_R > 20) { // threshold =11 // 28
+      if ( sound_L > 11 || sound_R > 11) { // threshold =11 // 28
 
         // Trigger for real sound onset
         digitalWrite(12, HIGH);
@@ -81,7 +82,7 @@ void loop() {
         delay(63000);     
         
         // for next track
-        track++;
+        //track++;
         // for next trial
         break;          
       }       

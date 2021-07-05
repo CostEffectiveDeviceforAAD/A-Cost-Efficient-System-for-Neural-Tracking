@@ -5,8 +5,6 @@
 """"""""""""""""""""""""""""""""""""""""""
 
 
-#================================== SET EXPERIMENT ================================================#
-
 ###### Imports #####
 import librosa, warnings, random, time, os, sys, serial, logging, argparse, mne, scipy.io, math
 import numpy as np
@@ -25,15 +23,16 @@ from brainflow.board_shim import BoardShim, BrainFlowInputParams, BoardIds, Brai
 from brainflow.data_filter import DataFilter, FilterTypes, AggOperations, WindowFunctions, DetrendOperations
 from Brainflow_stream import *
 
+
 #----------------------------- Connect to port of arduino ------------------------------#
+arduino = "COM8"        # kist
+#arduino = "COM10"       # hyu
 
-port = serial.Serial("COM10", 9600)
+port = serial.Serial(arduino, 9600)
 
-# kist = COM8
-# hyu = COM10
 #----------------------------- Open Brainflow network -----------------------------#
 # Connect Cyton
-board, args = Brainflow_stream('COM15')       # kist : COM7 / hy: COM15
+board, args = Brainflow_stream('COM7')       # kist : COM7 / hy: COM15
 
 # Set channels number
 eeg_channels = board.get_eeg_channels(args.board_id)
@@ -42,9 +41,8 @@ aux_channels = board.get_analog_channels(args.board_id)
 srate = board.get_sampling_rate(args.board_id)
 
 #----------------------------- Load Speech segment data ------------------------------#
-path = 'C:/Users/user/Desktop/hy-kist/OpenBCI'
-# kist : 'C:/Users/LeeJiWon/Desktop/OpenBCI'
-# hyu : 'C:/Users/user/Desktop/hy-kist/OpenBCI'
+path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'          # kist
+#path = 'C:/Users/user/Desktop/hy-kist/OpenBCI'      # hyu
 
 # Load All speech
 allspeech = np.load(path + '/AAD/Python/Allspeech.npy')
@@ -60,57 +58,61 @@ file = pd.read_excel(path + "/AAD/Python/question.xlsx")
 
 def Question(j, file):
 
-    # Question 1
-    text3 = visual.TextStim(screen, text = file.tweenty_Q1[j], height=50, color=[1, 1, 1], wrapWidth=2000)
-    text3.draw()
-    screen.flip()
+    try :
+        # Question 1
+        text3 = visual.TextStim(screen, text = file.tweenty_Q1[j], height=50, color=[1, 1, 1], wrapWidth=2000)
+        text3.draw()
+        screen.flip()
 
-    key = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
+        key = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True, maxWait = 10)
 
-    answer.append(key)
-    if file.tweenty_A1[j] == int(key[0]):
-        correct.append("T")
-    else:
-        correct.append("F")
+        answer.append(key)
+        if file.tweenty_A1[j] == int(key[0]):
+            correct.append("T")
+        else:
+            correct.append("F")
 
-    # Question 2
-    text3 = visual.TextStim(screen, text = file.tweenty_Q2[j], height=50, color=[1, 1, 1], wrapWidth=2000)
-    text3.draw()
-    screen.flip()
+        # Question 2
+        text3 = visual.TextStim(screen, text = file.tweenty_Q2[j], height=50, color=[1, 1, 1], wrapWidth=2000)
+        text3.draw()
+        screen.flip()
 
-    key = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
+        key = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
 
-    answer.append(key)
-    if file.tweenty_A2[j] == int(key[0]):
-        correct.append("T")
-    else:
-        correct.append("F")
+        answer.append(key)
+        if file.tweenty_A2[j] == int(key[0]):
+            correct.append("T")
+        else:
+            correct.append("F")
 
-    # Question 3
-    text3 = visual.TextStim(screen, text = file.journey_Q1[j], height=50, color=[1, 1, 1], wrapWidth=2000)
-    text3.draw()
-    screen.flip()
+        # Question 3
+        text3 = visual.TextStim(screen, text = file.journey_Q1[j], height=50, color=[1, 1, 1], wrapWidth=2000)
+        text3.draw()
+        screen.flip()
 
-    key = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
+        key = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
 
-    answer.append(key)
-    if file.journey_A1[j] == int(key[0]):
-        correct.append("T")
-    else:
-        correct.append("F")
+        answer.append(key)
+        if file.journey_A1[j] == int(key[0]):
+            correct.append("T")
+        else:
+            correct.append("F")
 
-    # Question 4
-    text3 = visual.TextStim(screen, text = file.journey_Q2[j], height=50, color=[1, 1, 1], wrapWidth=2000)
-    text3.draw()
-    screen.flip()
+        # Question 4
+        text3 = visual.TextStim(screen, text = file.journey_Q2[j], height=50, color=[1, 1, 1], wrapWidth=2000)
+        text3.draw()
+        screen.flip()
 
-    key = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
+        key = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
 
-    answer.append(key)
-    if file.journey_A2[j] == int(key[0]):
-        correct.append("T")
-    else:
-        correct.append("F")
+        answer.append(key)
+        if file.journey_A2[j] == int(key[0]):
+            correct.append("T")
+        else:
+            correct.append("F")
+
+    except:
+        correct.append("N")
 
     return correct, answer
 
@@ -173,6 +175,23 @@ screen = visual.Window([960, 900],
 
 # Draw text
 screen.flip()
+
+#------------------------------------- Warm up --------------------------------------------#
+tic = time.perf_counter()
+toc = time.perf_counter()
+while toc-tic < 30:
+
+    input = board.get_board_data()
+    eeg_data = input[eeg_channels, :]
+    aux_data = input[aux_channels, :]
+    print(eeg_data)
+
+    # If Nan value is entered, restart
+    if True in np.isnan(eeg_data):
+        print("Input NAN")
+        break
+
+    toc = time.perf_counter()
 
 #-------------------------------------- Intro ---------------------------------------------#
 file_2 = pd.read_excel(path + "/AAD/Python/intro.xlsx")
@@ -322,21 +341,8 @@ while tr < 30:   # 30
                 win = Preproccessing(win, srate, 0.5, 8, 3)  # data, sampling rate, low-cut, high-cut, filter order
                 data_l = len(win.T)
 
-                # If Nan value is entered, restart
-                if math.isnan(win[0, 0]) == True:
-                    print("Input NAN value")
-                    text3 = visual.TextStim(screen, text="죄송합니다. \n\n 다시 시작하겠습니다. \n\n 글씨가 사라진 후 스페이스 바를 눌러 다시 시작해주세요.",
-                                            height=80, color=[1, 1, 1])
-                    port.close()
-                    time.sleep(2)
-                    port = serial.Serial("COM10", 9600)
-                    time.sleep(2)
-                    text3.draw()
-                    screen.flip()
-                    break
-
             #------------------------------- Train set -------------------------------#
-                if tr < 2:  #int train
+                if tr < train:  #int train
                     state = "Train set"
 
 
@@ -368,36 +374,29 @@ while tr < 30:   # 30
                     r_L = np.append(r_L, r_l)
                     r_R = np.append(r_R, r_r)
 
+                    '''
                     ## Real-time Plotting ##
                     plt.clf()
                     if i == 0:
                         plt.ion()
                         fig, ax1 = plt.subplots()
                         ax2 = ax1.twiny()
-
-                    print("1")
+                    
                     # Time domain
                     x = np.arange(14, i + 15)
-                    print("2")
                     plt.plot(x, r_L, 'ob-', label='Left')
                     plt.plot(x, r_R, 'or-', label='Right')
-                    print("3")
                     # trial labeling
                     plt.ylabel("Correlation")
                     plt.xlabel("Time")
                     plt.grid(True)
                     plt.legend()
-                    print("4")
                     plt.xlim(0, 60)
                     plt.ylim(-0.3, 0.3)
-                    print("5")
                     fig.canvas.draw()
-                    print("5-1")
                     fig.canvas.flush_events()
-                    print("5-2")
                     plt.draw()
-                    print("6")
-
+                    '''
                     ###### Estimate accuracy #####
                     if r_r > r_l:
 
@@ -424,20 +423,20 @@ while tr < 30:   # 30
                 print("working time = {0}s".format(work))
 
         #------------------------ End 60s - one trial ------------------------#
-        if math.isnan(win[0,0]) == True:
-            break
-
         ##### Question #####
-        if tr+1 == file.TrNum[j] :
-            print("Question Time")
-            correct = []
-            answer = []
+        try :
+            if tr+1 == file.TrNum[j] :
+                print("Question Time")
+                correct = []
+                answer = []
 
-            Question(j, file)
+                Question(j, file)
 
-            Correct.append(correct)
-            Answer.append(answer)
-            j = j+1
+                Correct.append(correct)
+                Answer.append(answer)
+                j = j+1
+        except KeyError:                # 마지막 질문 후 에러나서
+            pass
 
         # Stack eeg_record per trial & Save
         EEG.append(eeg_record.T)
@@ -475,7 +474,7 @@ while tr < 30:   # 30
             print("Present Accuracy = {0}%".format(ACC[-1]*100))
             print("\n==================================\n")
 
-        # Save per trial // eeg, trigger, accuracy
+        # Save per trial // eeg, trigger, accuracy ,behavior
         EEG_all = np.asarray(EEG)
         AUX_all = np.asarray(AUX)
         scipy.io.savemat(path + '/save_data/E.mat', {'EEG': EEG_all})
@@ -498,20 +497,15 @@ print("The End")
 
 #### save ####
 # mat save
-scipy.io.savemat(path + '/save_data/E.mat', {'EEG': EEG_all})
-scipy.io.savemat(path + '/save_data/A.mat', {'AUX': AUX_all})
-
-# np save
 answer_all = np.asarray(Answer)
-correct_all = np.asarray(Correct)
-scipy.io.savemat(path + '/save_data/Behavior.mat', {'Behavior': correct_all})
 scipy.io.savemat(path + '/save_data/Answer.mat', {'Answer': answer_all})
 
+# np save
+np.save(path+'/save_data/EEG', EEG_all)
+np.save(path+'/save_data/A', AUX_all)
+np.save(path+'/save_data/All_Accuracy', ACC)
 entr_L = np.asarray(entr_L)
 entr_R = np.asarray(entr_R)
-np.save(path+'/save_data/EEG', EEG_all)
-np.save(path+'/save_data/AUX', AUX_all)
-np.save(path+'/save_data/All_Accuracy', ACC)
 np.save(path+'/save_data/All_correlation_right', entr_R)
 np.save(path+'/save_data/All_correlation_left', entr_L )
 
