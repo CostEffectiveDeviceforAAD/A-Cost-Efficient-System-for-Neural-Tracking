@@ -37,7 +37,7 @@ void setup() {
 }
 
 int input = 0;
-int track = 1;
+int track = 2;
 
 void loop() {
 
@@ -82,7 +82,7 @@ void loop() {
         delay(63000);     
         
         // for next track
-        //track++;
+        track++;
         // for next trial
         break;          
       }       
