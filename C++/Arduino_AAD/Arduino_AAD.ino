@@ -38,33 +38,32 @@ void setup() {
 
 int input = 0;
 int track = 2;
+<<<<<<< Updated upstream
+=======
+int thres = 28 ;
+>>>>>>> Stashed changes
 
 void loop() {
 
-  wTrig.stopAllTracks();
   digitalWrite(13, LOW);
   digitalWrite(12, LOW);
   digitalWrite(10, LOW);
 
-  /*
   int sound_L = analogRead(A0);
   int sound_R = analogRead(A1);
-  Serial.println(sound_R);
-  */
-  
-      
+  //Serial.println(sound_L);
+    
   // Trigger for start trial
   int input = Serial.read();
   if (input==49){  //int = 1 
-
+    
+    wTrig.stopAllTracks();
+    
     // start sound
     wTrig.trackPlaySolo(track);
     // Trigger for WAV onset
     digitalWrite(13, HIGH);
           
-    // Check LED (ouside)
-    digitalWrite(10,HIGH);
-    
     while(true) {    
       
       // Detect analog signal of sound(beep sound)
@@ -73,10 +72,13 @@ void loop() {
       //Serial.println(sound_R);
 
 
-      if ( sound_L > 11 || sound_R > 11) { // threshold =11 // 28
+      if ( sound_L > thres || sound_R > thres) { // threshold =11 // 28 ll 11
 
         // Trigger for real sound onset
         digitalWrite(12, HIGH);
+
+        // Check LED (ouside)
+        digitalWrite(10,HIGH);
 
         // Play Wav file during 63s 
         delay(63000);     
@@ -89,7 +91,32 @@ void loop() {
       
     }
   }
+  else if (input == 50){
+    wTrig.trackPlaySolo(1);
+
+      while(true){
+        // Detect analog signal of sound(beep sound)
+        int sound_L = analogRead(A0);
+        int sound_R = analogRead(A1);
   
+        if ( sound_L > thres || sound_R > thres) { // threshold =11 // 28 ll 11
+  
+          // Trigger for real sound onset
+          digitalWrite(12, HIGH);
+  
+          // Check LED (ouside)
+          digitalWrite(10,HIGH);
+  
+          // Play Wav file during 63s 
+          delay(10000);     
+          
+          // for next track
+          //track++;
+          // for next trial
+          break;          
+        } 
+     }
+  }
 }
 
               

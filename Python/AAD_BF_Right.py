@@ -6,13 +6,10 @@
 
 
 ###### Imports #####
-import librosa, warnings, random, time, os, sys, serial, logging, argparse, mne, scipy.io, math
+import librosa, warnings, random, time, os, sys, serial, logging, argparse, mne, scipy.io, math, datetime
 import numpy as np
 import matplotlib.pyplot as plt
-
 import pandas as pd
-from pylsl import StreamInlet, resolve_stream, StreamInfo
-#from OpenBCI_lsl import *
 from scipy import signal
 from scipy.signal import butter, lfilter, resample, filtfilt
 #from helper import *
@@ -24,25 +21,27 @@ from brainflow.data_filter import DataFilter, FilterTypes, AggOperations, Window
 from Brainflow_stream import *
 
 
-#----------------------------- Connect to port of arduino ------------------------------#
-arduino = "COM8"        # kist
-#arduino = "COM10"       # hyu
 
+#-------------------------------- SETTING ---------------------------------#
+#loc = 'kist'
+loc = 'hyu'
+
+if loc == 'kist':
+    arduino = "COM8"
+    path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
+    cyton = 'COM7'
+elif loc == 'hyu':
+    arduino = "COM10"
+    path = 'C:/Users/user/Desktop/hy-kist/OpenBCI'
+    cyton = 'COM15'
+
+# Connect to port of arduino
 port = serial.Serial(arduino, 9600)
 
-#----------------------------- Open Brainflow network -----------------------------#
-# Connect Cyton
-board, args = Brainflow_stream('COM7')       # kist : COM7 / hy: COM15
-
-# Set channels number
-eeg_channels = board.get_eeg_channels(args.board_id)
-aux_channels = board.get_analog_channels(args.board_id)
-
-srate = board.get_sampling_rate(args.board_id)
+# Connect Cyton with Brainflow network
+board, args = Brainflow_stream(cyton)       # kist : COM7 / hy: COM15
 
 #----------------------------- Load Speech segment data ------------------------------#
-path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'          # kist
-#path = 'C:/Users/user/Desktop/hy-kist/OpenBCI'      # hyu
 
 # Load All speech
 allspeech = np.load(path + '/AAD/Python/Allspeech.npy')
@@ -55,7 +54,6 @@ stim_R = allspeech[30:, :]       # 30 by 3840   // trial by time
 
 file = pd.read_excel(path + "/AAD/Python/question.xlsx")
 
-
 def Question(j, file):
 
     try :
@@ -64,7 +62,7 @@ def Question(j, file):
         text3.draw()
         screen.flip()
 
-        key = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True, maxWait = 10)
+        key = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
 
         answer.append(key)
         if file.tweenty_A1[j] == int(key[0]):
@@ -116,7 +114,6 @@ def Question(j, file):
 
     return correct, answer
 
-
 #----------------------------- Parameter Setting -----------------------------#
 
 ############## Exp parameter ################
@@ -128,71 +125,67 @@ Dir = -1
 reg_lambda = 10
 train = 14
 
+# Set channels number & sampling rate
+eeg_channels = board.get_eeg_channels(args.board_id)
+aux_channels = board.get_analog_channels(args.board_id)
+srate = board.get_sampling_rate(args.board_id)
+
 ##############################################
 
 # Set int
-r_L = []
-r_R = []
-Acc = []
-ACC = []
-model_w = []
-inter_w = []
-entr_L =[]
-entr_R = []
-EEG = []
-AUX = []
-start = []
-end = []
-Correct = []
-Answer = []
+r_L = r_R = Acc = ACC = []
+model_w = inter_w = entr_L = entr_R = []
+EEG = AUX = Correct = Answer = []
+start = end = []
 
-eeg_record = np.zeros((16,1))
-aux_record = np.zeros((3,1))
-EEG_all = np.array([])
-AUX_all = np.array([])
-answer_all = np.array([])
-correct_all = np.array([])
+# for trial array / for entire array
+eeg_record = raw_data= np.zeros((16,1))
+aux_record = tri_data = np.zeros((3,1))
+EEG_all = AUX_all = np.array([])
+answer_all = correct_all = np.array([])
 
-w = 1
-j = 0
-tr = 0
+w = 1           # To avoid repeat when detect trigger
+j = 0           # Question number
+tr = 0          # trial
 
 #----------------------------- Make the window for Psychopy -----------------------------#
 
-screen = visual.Window([960, 900],
-    screen = 0,
-    pos = [600,0],
-    fullscr = False,
-    winType = 'pyglet',
-    allowGUI = False,
-    allowStencil = False,
-    monitor ='testMonitor',
-    color = [-1,-1,-1],
-    blendMode = 'avg',
-    units = 'pix'
-    #pos = [100,0]
-                    )
+screen = visual.Window([960, 900], screen = 0, pos = [600,0], fullscr = False,
+                       winType = 'pyglet', allowGUI = False, allowStencil = False,
+                       monitor ='testMonitor', color = [-1,-1,-1], blendMode = 'avg',
+                       units = 'pix')
 
-# Draw text
+text_p  = visual.TextStim(screen, text = " + ", height = 100, color = [1, 1, 1])
+text_d = visual.TextStim(screen, text = ">>>>", height = 100, color = [1, 1, 1])
+
+# Draw window
 screen.flip()
 
-#------------------------------------- Warm up --------------------------------------------#
+#--------------------------------------- Warm up ------------------------------------------#
 tic = time.perf_counter()
 toc = time.perf_counter()
-while toc-tic < 30:
+
+print("Warming up")
+port.write(b'2')
+while toc-tic < 30:         # During 60s
 
     input = board.get_board_data()
     eeg_data = input[eeg_channels, :]
     aux_data = input[aux_channels, :]
-    print(eeg_data)
+    print(aux_data)
 
     # If Nan value is entered, restart
     if True in np.isnan(eeg_data):
         print("Input NAN")
         break
+    key = event.getKeys()
+    if key == ["escape"]:
+        core.quit()
 
+    time.sleep(1)
     toc = time.perf_counter()
 
+print("Warming up End")
 #-------------------------------------- Intro ---------------------------------------------#
 file_2 = pd.read_excel(path + "/AAD/Python/intro.xlsx")
 
@@ -207,12 +200,12 @@ for i in range(0,9):
     text.draw()
     screen.flip()
 
-
 #==================================================================================================#
 #-------------------------------------- START EXPERIMENT ------------------------------------------#
 #==================================================================================================#
 
-#---------- Start 30 trial ----------#
+
+######      Start 30 trial      ######
 
 while tr < 30:   # 30
 
@@ -222,51 +215,40 @@ while tr < 30:   # 30
     key2 = event.getKeys()
     if key2 == ["space"] and tr == 0:
 
-        # Ready
-        time.sleep(3)
+        time.sleep(3)                       # First Interval
+        port.write(b'1')                    # Send signal to arduino for start sound
+        input = board.get_board_data()      # Do not stack previous data
+        raw_data = np.concatenate((raw_data, input[eeg_channels, :]), axis=1)
+        tri_data = np.concatenate((tri_data, input[aux_channels, :]), axis=1)
 
-        # Send signal to arduino for start sound
-        port.write(b'1')
-
-        # Set Text_2
-        text2 = visual.TextStim(screen, text=">>>>", height=100, color=[1, 1, 1])
-        text2.draw()
+        # Draw Text of direction
+        text_d.draw()
         screen.flip()
 
-    elif tr > 0 and w == 1 :
+    elif tr > 0 and w == 1 :                # After First trial, continues
 
-        # Set Text_1 - Start
-        text = visual.TextStim(screen, text=" + ", height=100, color=[1, 1, 1])
-
-        # Draw text
-        text.draw()
+        # Draw Text
+        text_p.draw()
         screen.flip()
+        time.sleep(3)                       # Interval
+        port.write(b'1')                    # Send signal to arduino for start sound
 
-        # Interval
-        time.sleep(3)
-        #print("wait")
-
-        # Send signal to arduino for start sound
-        port.write(b'1')
-        # Do not stack previous data
-        input = board.get_board_data()
-
-        # Set Text_2
-        text2 = visual.TextStim(screen, text=">>>>", height=80, color=[1, 1, 1])
-        text2.draw()
+        input = board.get_board_data()      # Do not stack previous data
+        raw_data = np.concatenate((raw_data, input[eeg_channels, :]), axis=1)
+        tri_data = np.concatenate((tri_data, input[aux_channels, :]), axis=1)
+        # Draw Text of direction
+        text_d.draw()
         screen.flip()
+        # Avoid repeat
         w = 0
-
-        # Reset
-        eeg_record = np.zeros((16,1))
-        aux_record = np.zeros((3,1))
 
     # Trigger detection
     input = board.get_board_data()
-    eeg_data = input[eeg_channels, :]
     aux_data = input[aux_channels, :]
-    eeg_record = np.concatenate((eeg_record, eeg_data), axis=1)
-    aux_record = np.concatenate((aux_record, aux_data), axis=1)
+    eeg_record = np.concatenate((eeg_record, input[eeg_channels, :]), axis=1)
+    aux_record = np.concatenate((aux_record, input[aux_channels, :]), axis=1)
+    raw_data = np.concatenate((raw_data, input[eeg_channels, :]), axis=1)
+    tri_data = np.concatenate((tri_data, input[aux_channels, :]), axis=1)
     print(aux_data)
 
     #----------------------------- Trigger detection -----------------------------#
@@ -290,41 +272,34 @@ while tr < 30:   # 30
 
         # onset 부터 3초 지나고 원하는 시간(한 trial) 동안 돌아가도록
         speech = onset + (srate*3) + 1   # 3초 후 부터가 speech 이기에 +1
-        while i != 46:  # 46 번째 window 까지 (0~45)
+        while i != 46:                   # 46 번째 window 까지 (0~45)
 
             # if the processing time exceeds 1s, no time sleep
             if work > 1:
                 work = 1
 
-            # Wait 1s
-            time.sleep(1 - work)
+            time.sleep(1 - work)            # Wait 1s
+            start = time.perf_counter()     # Time count
 
-            # Time count
-            start = time.perf_counter()
-
-            ### Receive sample ###
+            #####  Receive sample  #####
             input = board.get_board_data()
-            # Separate EEG, AUX
-            eeg_data = input[eeg_channels, :]
-            aux_data = input[aux_channels, :]                 # 11,12,13 / 0 or 1
             print(len(eeg_data.T))
-
             # Stack data
-            eeg_record = np.concatenate((eeg_record, eeg_data), axis=1)     # channel by time
-            aux_record = np.concatenate((aux_record, aux_data), axis=1)
+            eeg_record = np.concatenate((eeg_record, input[eeg_channels, :]), axis=1)     # channel by time
+            aux_record = np.concatenate((aux_record, input[aux_channels, :]), axis=1)
+            raw_data = np.concatenate((raw_data, input[eeg_channels, :]), axis=1)
+            tri_data = np.concatenate((tri_data, input[aux_channels, :]), axis=1)
 
             # Count time
             end = time.perf_counter()
             work = end - start
 
-
             # Stack samples until 15s and window sliding per 1s
             # After 15s, rely on time sleep.
             if len(eeg_record.T) >= (speech + (srate * 15)):
 
-                # Adjust data as acquired from that time.
+                # Adjust data as acquired from that time
                 win = eeg_record[:, speech + srate*(i) :]
-                trg = aux_record[:, speech + srate*(i) :]
 
                 if len(win.T) > srate*(15):
                     win = eeg_record[:, speech + srate*(i) : speech + srate*(15+i)]
@@ -335,18 +310,17 @@ while tr < 30:   # 30
                 print("Time Check : {0}s".format(len(eeg_record[:, speech:].T) / srate))
 
 
-            #----------------------------- Pre-processing -----------------------------#
+                #----------------------------- Pre-processing -----------------------------#
                 # preprocessing_ha.py
 
-                win = Preproccessing(win, srate, 0.5, 8, 3)  # data, sampling rate, low-cut, high-cut, filter order
+                win = Preproccessing(win, srate, 0.5, 8, 750)    # data, sampling rate, low-cut, high-cut, filter order
                 data_l = len(win.T)
 
-            #------------------------------- Train set -------------------------------#
+                #------------------------------- Train set -------------------------------#
                 if tr < train:  #int train
                     state = "Train set"
 
-
-                    ## mTRF train function ##
+                    ###   mTRF train function   ###
                     model, tlag, inter = mtrf_train(stim_R[tr:tr+1, 64*(i):64*(i)+data_l].T, win.T, fs, Dir, tmin, tmax, reg_lambda)
                     
                     'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'
@@ -374,43 +348,19 @@ while tr < 30:   # 30
                     r_L = np.append(r_L, r_l)
                     r_R = np.append(r_R, r_r)
 
-                    '''
-                    ## Real-time Plotting ##
-                    plt.clf()
-                    if i == 0:
-                        plt.ion()
-                        fig, ax1 = plt.subplots()
-                        ax2 = ax1.twiny()
-                    
-                    # Time domain
-                    x = np.arange(14, i + 15)
-                    plt.plot(x, r_L, 'ob-', label='Left')
-                    plt.plot(x, r_R, 'or-', label='Right')
-                    # trial labeling
-                    plt.ylabel("Correlation")
-                    plt.xlabel("Time")
-                    plt.grid(True)
-                    plt.legend()
-                    plt.xlim(0, 60)
-                    plt.ylim(-0.3, 0.3)
-                    fig.canvas.draw()
-                    fig.canvas.flush_events()
-                    plt.draw()
-                    '''
                     ###### Estimate accuracy #####
                     if r_r > r_l:
-
                         acc = 1
-
                     else:
-
                         acc = 0
 
-                    #print("acc : {0}".format(acc))
+                    print("-------------------------------")
+                    print("acc : {0}".format(acc))
+                    print("-------------------------------")
 
                     # Save acc for entire Accuracy
                     Acc = np.append(Acc, acc)
-
+1
                     # Up window number
                     i = i + 1
                     # Time count
@@ -430,7 +380,7 @@ while tr < 30:   # 30
                 correct = []
                 answer = []
 
-                Question(j, file)
+                correct, answer = Question(j, file)
 
                 Correct.append(correct)
                 Answer.append(answer)
@@ -441,6 +391,9 @@ while tr < 30:   # 30
         # Stack eeg_record per trial & Save
         EEG.append(eeg_record.T)
         AUX.append(aux_record.T)
+        # Reset
+        eeg_record = np.zeros((16,1))
+        aux_record = np.zeros((3,1))
 
         ###### The things that have to calculate per trial ######
         ## Add model_w case train
@@ -477,8 +430,11 @@ while tr < 30:   # 30
         # Save per trial // eeg, trigger, accuracy ,behavior
         EEG_all = np.asarray(EEG)
         AUX_all = np.asarray(AUX)
+
         scipy.io.savemat(path + '/save_data/E.mat', {'EEG': EEG_all})
         scipy.io.savemat(path + '/save_data/A.mat', {'AUX': AUX_all})
+        scipy.io.savemat(path + '/save_data/RAW.mat', {'RAW': raw_data})
+        scipy.io.savemat(path + '/save_data/TRIGGER.mat', {'TRIGGER': tri_data})
         scipy.io.savemat(path + '/save_data/Accuracy.mat', {'Acc': ACC})
         correct_all = np.asarray(Correct)
         scipy.io.savemat(path + '/save_data/Behavior.mat', {'Behavior': correct_all})
@@ -488,6 +444,12 @@ while tr < 30:   # 30
         w = 1
 
 #----------------------------- 30 trial End -----------------------------#
+final = visual.TextStim(screen, text="수고하셨습니다.", height=70, color=[1, 1, 1], wrapWidth=2000)
+
+text.draw()
+screen.flip()
+time.sleep(3)
+
 port.close()
 screen.close()
 board.stop_stream()
