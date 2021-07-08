@@ -6,20 +6,24 @@
 
 
 ###### Imports #####
-import librosa, warnings, random, time, os, sys, serial, logging, argparse, mne, scipy.io, math, datetime
+import librosa, warnings, random, time, os, sys, serial, logging, argparse, mne, scipy.io, math
 import numpy as np
 import matplotlib.pyplot as plt
+
 import pandas as pd
+from pylsl import StreamInlet, resolve_stream, StreamInfo
+#from OpenBCI_lsl import *
 from scipy import signal
 from scipy.signal import butter, lfilter, resample, filtfilt
 #from helper import *
 from pymtrf import *
 from psychopy import visual, core, event
 from preprocessing_ha import *
+from Comments import *
+from Direction import *
 from brainflow.board_shim import BoardShim, BrainFlowInputParams, BoardIds, BrainFlowError, LogLevels
 from brainflow.data_filter import DataFilter, FilterTypes, AggOperations, WindowFunctions, DetrendOperations
 from Brainflow_stream import *
-
 
 
 #-------------------------------- SETTING ---------------------------------#
@@ -31,15 +35,19 @@ if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
     cyton = 'COM7'
 elif loc == 'hyu':
-    arduino = "COM10"
+    arduino = "COM4"   # casing COM4 // File box COM10
     path = 'C:/Users/user/Desktop/hy-kist/OpenBCI'
-    cyton = 'COM15'
+    cyton = 'COM3'    # casing COM3 // File box COM14
 
 # Connect to port of arduino
 port = serial.Serial(arduino, 9600)
 
 # Connect Cyton with Brainflow network
 board, args = Brainflow_stream(cyton)       # kist : COM7 / hy: COM15
+
+###############
+original = 'L'
+opposite = 'R'
 
 #----------------------------- Load Speech segment data ------------------------------#
 
@@ -49,70 +57,6 @@ allspeech = np.load(path + '/AAD/Python/Allspeech.npy')
 
 stim_L = allspeech[:30, :]       # 30 by 3840   // trial by time
 stim_R = allspeech[30:, :]       # 30 by 3840   // trial by time
-
-#------------------------------------ Question ------------------------------------------------#
-
-file = pd.read_excel(path + "/AAD/Python/question.xlsx")
-
-def Question(j, file):
-
-    try :
-        # Question 1
-        text3 = visual.TextStim(screen, text = file.tweenty_Q1[j], height=50, color=[1, 1, 1], wrapWidth=2000)
-        text3.draw()
-        screen.flip()
-
-        key = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
-
-        answer.append(key)
-        if file.tweenty_A1[j] == int(key[0]):
-            correct.append("T")
-        else:
-            correct.append("F")
-
-        # Question 2
-        text3 = visual.TextStim(screen, text = file.tweenty_Q2[j], height=50, color=[1, 1, 1], wrapWidth=2000)
-        text3.draw()
-        screen.flip()
-
-        key = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
-
-        answer.append(key)
-        if file.tweenty_A2[j] == int(key[0]):
-            correct.append("T")
-        else:
-            correct.append("F")
-
-        # Question 3
-        text3 = visual.TextStim(screen, text = file.journey_Q1[j], height=50, color=[1, 1, 1], wrapWidth=2000)
-        text3.draw()
-        screen.flip()
-
-        key = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
-
-        answer.append(key)
-        if file.journey_A1[j] == int(key[0]):
-            correct.append("T")
-        else:
-            correct.append("F")
-
-        # Question 4
-        text3 = visual.TextStim(screen, text = file.journey_Q2[j], height=50, color=[1, 1, 1], wrapWidth=2000)
-        text3.draw()
-        screen.flip()
-
-        key = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
-
-        answer.append(key)
-        if file.journey_A2[j] == int(key[0]):
-            correct.append("T")
-        else:
-            correct.append("F")
-
-    except:
-        correct.append("N")
-
-    return correct, answer
 
 #----------------------------- Parameter Setting -----------------------------#
 
@@ -131,7 +75,6 @@ aux_channels = board.get_analog_channels(args.board_id)
 srate = board.get_sampling_rate(args.board_id)
 
 ##############################################
-
 # Set int
 r_L = r_R = Acc = ACC = []
 model_w = inter_w = entr_L = entr_R = []
@@ -147,27 +90,23 @@ answer_all = correct_all = np.array([])
 w = 1           # To avoid repeat when detect trigger
 j = 0           # Question number
 tr = 0          # trial
+##########################
 
 #----------------------------- Make the window for Psychopy -----------------------------#
 
-screen = visual.Window([960, 900], screen = 0, pos = [600,0], fullscr = False,
+screen = visual.Window([960, 900], screen = 1, pos = [600,0], fullscr = False,
                        winType = 'pyglet', allowGUI = False, allowStencil = False,
                        monitor ='testMonitor', color = [-1,-1,-1], blendMode = 'avg',
                        units = 'pix')
 
-text_p  = visual.TextStim(screen, text = " + ", height = 100, color = [1, 1, 1])
-text_d = visual.TextStim(screen, text = ">>>>", height = 100, color = [1, 1, 1])
-
-# Draw window
-screen.flip()
-
-#--------------------------------------- Warm up ------------------------------------------#
+#------------------------------------- Warm up --------------------------------------------#
+event.waitKeys(keyList=['space'], clearEvents=True)
 tic = time.perf_counter()
 toc = time.perf_counter()
 
 print("Warming up")
 port.write(b'2')
-while toc-tic < 30:         # During 60s
+while toc-tic < 20:         # During 60s
 
     input = board.get_board_data()
     eeg_data = input[eeg_channels, :]
@@ -186,69 +125,37 @@ while toc-tic < 30:         # During 60s
     toc = time.perf_counter()
 
 print("Warming up End")
+
 #-------------------------------------- Intro ---------------------------------------------#
-file_2 = pd.read_excel(path + "/AAD/Python/intro.xlsx")
+file = pd.read_excel(path + "/AAD/Python/question.xlsx")
+file_2 = pd.read_excel(path + "/AAD/Python/Comments.xlsx")
 
-for i in range(0,9):
-
-    text = visual.TextStim(screen, text=file_2.coment[i], height=50, color=[1, 1, 1],wrapWidth=2000)
-
-    key = event.waitKeys(keyList=["space", "escape"], clearEvents=True)
-    if key == ["escape"]:
-        core.quit()
-
-    text.draw()
-    screen.flip()
+event.waitKeys(keyList=['space'], clearEvents=True)
+Comments('intro', path, screen)
 
 #==================================================================================================#
 #-------------------------------------- START EXPERIMENT ------------------------------------------#
 #==================================================================================================#
 
-
-######      Start 30 trial      ######
+#---------- Start 30 trial ----------#
 
 while tr < 30:   # 30
 
     #----------------------------- Psychopy Window & Serial Write ------------------------------#
-
-    # Press Button for start
-    key2 = event.getKeys()
-    if key2 == ["space"] and tr == 0:
-
-        time.sleep(3)                       # First Interval
-        port.write(b'1')                    # Send signal to arduino for start sound
-        input = board.get_board_data()      # Do not stack previous data
-        raw_data = np.concatenate((raw_data, input[eeg_channels, :]), axis=1)
-        tri_data = np.concatenate((tri_data, input[aux_channels, :]), axis=1)
-
-        # Draw Text of direction
-        text_d.draw()
-        screen.flip()
-
-    elif tr > 0 and w == 1 :                # After First trial, continues
-
-        # Draw Text
-        text_p.draw()
-        screen.flip()
-        time.sleep(3)                       # Interval
-        port.write(b'1')                    # Send signal to arduino for start sound
-
-        input = board.get_board_data()      # Do not stack previous data
-        raw_data = np.concatenate((raw_data, input[eeg_channels, :]), axis=1)
-        tri_data = np.concatenate((tri_data, input[aux_channels, :]), axis=1)
-        # Draw Text of direction
-        text_d.draw()
-        screen.flip()
-        # Avoid repeat
+    if w == 1:
+        Direction(tr, original, opposite, screen, port)
+        port.write(b'1')
         w = 0
+
 
     # Trigger detection
     input = board.get_board_data()
+    eeg_data = input[eeg_channels, :]
     aux_data = input[aux_channels, :]
-    eeg_record = np.concatenate((eeg_record, input[eeg_channels, :]), axis=1)
-    aux_record = np.concatenate((aux_record, input[aux_channels, :]), axis=1)
-    raw_data = np.concatenate((raw_data, input[eeg_channels, :]), axis=1)
-    tri_data = np.concatenate((tri_data, input[aux_channels, :]), axis=1)
+    eeg_record = np.concatenate((eeg_record, eeg_data), axis=1)
+    aux_record = np.concatenate((aux_record, aux_data), axis=1)
+    raw_data = np.concatenate((raw_data, eeg_data), axis=1)
+    tri_data = np.concatenate((tri_data, aux_data), axis=1)
     print(aux_data)
 
     #----------------------------- Trigger detection -----------------------------#
@@ -266,29 +173,41 @@ while tr < 30:   # 30
         # Format per trial
         i = 0           # Window number
         work = 0        # Time count
-
+        check  = -3
 
     #----------------------------- Working while 60s -----------------------------#
 
         # onset 부터 3초 지나고 원하는 시간(한 trial) 동안 돌아가도록
         speech = onset + (srate*3) + 1   # 3초 후 부터가 speech 이기에 +1
-        while i != 46:                   # 46 번째 window 까지 (0~45)
+        while i != 46:  # 46 번째 window 까지 (0~45)
 
             # if the processing time exceeds 1s, no time sleep
             if work > 1:
                 work = 1
 
-            time.sleep(1 - work)            # Wait 1s
-            start = time.perf_counter()     # Time count
+            # Wait 1s
+            time.sleep(1 - work)
 
-            #####  Receive sample  #####
+            # predicted time count
+            check = check + 1
+            print("--------------------------------------")
+            print("Time sleep : {0}".format(check))
+
+            # Time count
+            start = time.perf_counter()
+
+            ### Receive sample ###
             input = board.get_board_data()
-            print(len(eeg_data.T))
+            # Separate EEG, AUX
+            eeg_data = input[eeg_channels, :]
+            aux_data = input[aux_channels, :]                 # 11,12,13 / 0 or 1
+            print("INPUT : {0}".format(len(eeg_data.T)))
+
             # Stack data
-            eeg_record = np.concatenate((eeg_record, input[eeg_channels, :]), axis=1)     # channel by time
-            aux_record = np.concatenate((aux_record, input[aux_channels, :]), axis=1)
-            raw_data = np.concatenate((raw_data, input[eeg_channels, :]), axis=1)
-            tri_data = np.concatenate((tri_data, input[aux_channels, :]), axis=1)
+            eeg_record = np.concatenate((eeg_record, eeg_data), axis=1)     # channel by time
+            aux_record = np.concatenate((aux_record, aux_data), axis=1)
+            raw_data = np.concatenate((raw_data, eeg_data), axis=1)
+            tri_data = np.concatenate((tri_data, aux_data), axis=1)
 
             # Count time
             end = time.perf_counter()
@@ -296,31 +215,30 @@ while tr < 30:   # 30
 
             # Stack samples until 15s and window sliding per 1s
             # After 15s, rely on time sleep.
-            if len(eeg_record.T) >= (speech + (srate * 15)):
+            if check >= 15:
 
-                # Adjust data as acquired from that time
+                # Adjust data as acquired from that time.
                 win = eeg_record[:, speech + srate*(i) :]
+                trg = aux_record[:, speech + srate*(i) :]
 
                 if len(win.T) > srate*(15):
                     win = eeg_record[:, speech + srate*(i) : speech + srate*(15+i)]
-                    print("over")
 
                 # Check print
                 print("Window number : {0}".format(i+1))
                 print("Time Check : {0}s".format(len(eeg_record[:, speech:].T) / srate))
 
-
-                #----------------------------- Pre-processing -----------------------------#
+            #----------------------------- Pre-processing -----------------------------#
                 # preprocessing_ha.py
 
-                win = Preproccessing(win, srate, 0.5, 8, 750)    # data, sampling rate, low-cut, high-cut, filter order
+                win = Preproccessing(win, srate, 0.5, 8, 3)  # data, sampling rate, low-cut, high-cut, filter order
                 data_l = len(win.T)
 
-                #------------------------------- Train set -------------------------------#
+            #------------------------------- Train set -------------------------------#
                 if tr < train:  #int train
                     state = "Train set"
 
-                    ###   mTRF train function   ###
+                    ## mTRF train function ##
                     model, tlag, inter = mtrf_train(stim_R[tr:tr+1, 64*(i):64*(i)+data_l].T, win.T, fs, Dir, tmin, tmax, reg_lambda)
                     
                     'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'
@@ -354,33 +272,34 @@ while tr < 30:   # 30
                     else:
                         acc = 0
 
-                    print("-------------------------------")
-                    print("acc : {0}".format(acc))
-                    print("-------------------------------")
+                    print("------ acc : {0} ------".format(acc))
 
                     # Save acc for entire Accuracy
                     Acc = np.append(Acc, acc)
 
                     # Up window number
                     i = i + 1
-                    # Time count
-                    end = time.perf_counter()
 
-                ## End one window
+                #-- End one windo --w
 
-                #end = time.process_time()
+                # In trial 27~30, switch direction
+                if tr+1 >= 27 and check > 25:
+
+                    switching(tr, check, original, opposite, screen)
+
+
+                # Time count
+                end = time.perf_counter()
                 work = end - start
                 print("working time = {0}s".format(work))
 
         #------------------------ End 60s - one trial ------------------------#
-        ##### Question #####
-        try :
-            if tr+1 == file.TrNum[j] :
+    ##### Question #####
+        try:
+            if tr + 1 == file.TrNum[j]:
                 print("Question Time")
-                correct = []
-                answer = []
 
-                correct, answer = Question(j, file)
+                correct, answer = Question(j, file, path, screen)
 
                 Correct.append(correct)
                 Answer.append(answer)
@@ -391,9 +310,9 @@ while tr < 30:   # 30
         # Stack eeg_record per trial & Save
         EEG.append(eeg_record.T)
         AUX.append(aux_record.T)
-        # Reset
-        eeg_record = np.zeros((16,1))
-        aux_record = np.zeros((3,1))
+        # For Next trial
+        eeg_record = np.zeros((16, 1))
+        aux_record = np.zeros((3, 1))
 
         ###### The things that have to calculate per trial ######
         ## Add model_w case train
@@ -430,7 +349,6 @@ while tr < 30:   # 30
         # Save per trial // eeg, trigger, accuracy ,behavior
         EEG_all = np.asarray(EEG)
         AUX_all = np.asarray(AUX)
-
         scipy.io.savemat(path + '/save_data/E.mat', {'EEG': EEG_all})
         scipy.io.savemat(path + '/save_data/A.mat', {'AUX': AUX_all})
         scipy.io.savemat(path + '/save_data/RAW.mat', {'RAW': raw_data})
@@ -439,14 +357,18 @@ while tr < 30:   # 30
         correct_all = np.asarray(Correct)
         scipy.io.savemat(path + '/save_data/Behavior.mat', {'Behavior': correct_all})
 
-        # For Next trial
-        tr = tr+1
+        #----------------------- Comments ---------------------------------#
+
+        Comments(tr, path, screen)
+
+        tr = tr
         w = 1
 
 #----------------------------- 30 trial End -----------------------------#
-final = visual.TextStim(screen, text="수고하셨습니다.", height=70, color=[1, 1, 1], wrapWidth=2000)
 
-text.draw()
+print("The End")
+final = visual.TextStim(screen, text="실험이 끝났습니다. \n\n 수고하셨습니다.", height=50, color=[1, 1, 1], wrapWidth=2000)
+final.draw()
 screen.flip()
 time.sleep(3)
 
@@ -454,7 +376,6 @@ port.close()
 screen.close()
 board.stop_stream()
 board.release_session()
-print("The End")
 
 
 #### save ####

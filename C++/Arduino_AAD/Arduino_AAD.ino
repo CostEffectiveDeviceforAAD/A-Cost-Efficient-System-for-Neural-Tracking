@@ -38,10 +38,8 @@ void setup() {
 
 int input = 0;
 int track = 2;
-<<<<<<< Updated upstream
-=======
-int thres = 28 ;
->>>>>>> Stashed changes
+
+int thres = 11 ;
 
 void loop() {
 
@@ -52,15 +50,15 @@ void loop() {
   int sound_L = analogRead(A0);
   int sound_R = analogRead(A1);
   //Serial.println(sound_L);
-    
+
+   
   // Trigger for start trial
   int input = Serial.read();
   if (input==49){  //int = 1 
     
-    wTrig.stopAllTracks();
-    
     // start sound
     wTrig.trackPlaySolo(track);
+    
     // Trigger for WAV onset
     digitalWrite(13, HIGH);
           
@@ -81,7 +79,7 @@ void loop() {
         digitalWrite(10,HIGH);
 
         // Play Wav file during 63s 
-        delay(63000);     
+        delay(62000);     
         
         // for next track
         track++;

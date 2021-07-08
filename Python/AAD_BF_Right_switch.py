@@ -26,25 +26,30 @@ from brainflow.data_filter import DataFilter, FilterTypes, AggOperations, Window
 from Brainflow_stream import *
 
 
-#----------------------------- Connect to port of arduino ------------------------------#
-arduino = "COM8"        # kist
-#arduino = "COM10"       # hyu
+#-------------------------------- SETTING ---------------------------------#
+#loc = 'kist'
+loc = 'hyu'
 
+if loc == 'kist':
+    arduino = "COM8"
+    path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
+    cyton = 'COM7'
+elif loc == 'hyu':
+    arduino = "COM10"
+    path = 'C:/Users/user/Desktop/hy-kist/OpenBCI'
+    cyton = 'COM15'
+
+# Connect to port of arduino
 port = serial.Serial(arduino, 9600)
 
-#----------------------------- Open Brainflow network -----------------------------#
-# Connect Cyton
-board, args = Brainflow_stream('COM7')       # kist : COM7 / hy: COM15
+# Connect Cyton with Brainflow network
+board, args = Brainflow_stream(cyton)       # kist : COM7 / hy: COM15
 
-# Set channels number
-eeg_channels = board.get_eeg_channels(args.board_id)
-aux_channels = board.get_analog_channels(args.board_id)
-
-srate = board.get_sampling_rate(args.board_id)
+###############
+original = 'L'
+opposite = 'R'
 
 #----------------------------- Load Speech segment data ------------------------------#
-path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'          # kist
-#path = 'C:/Users/user/Desktop/hy-kist/OpenBCI'      # hyu
 
 # Load All speech
 allspeech = np.load(path + '/AAD/Python/Allspeech.npy')
@@ -64,71 +69,62 @@ Dir = -1
 reg_lambda = 10
 train = 14
 
+# Set channels number & sampling rate
+eeg_channels = board.get_eeg_channels(args.board_id)
+aux_channels = board.get_analog_channels(args.board_id)
+srate = board.get_sampling_rate(args.board_id)
+
 ##############################################
-
 # Set int
-r_L = []
-r_R = []
-Acc = []
-ACC = []
-model_w = []
-inter_w = []
-entr_L =[]
-entr_R = []
-EEG = []
-AUX = []
-start = []
-end = []
-Correct = []
-Answer = []
+r_L = r_R = Acc = ACC = []
+model_w = inter_w = entr_L = entr_R = []
+EEG = AUX = Correct = Answer = []
+start = end = []
 
-eeg_record = np.zeros((16,1))
-aux_record = np.zeros((3,1))
-EEG_all = np.array([])
-AUX_all = np.array([])
-answer_all = np.array([])
-correct_all = np.array([])
+# for trial array / for entire array
+eeg_record = raw_data= np.zeros((16,1))
+aux_record = tri_data = np.zeros((3,1))
+EEG_all = AUX_all = np.array([])
+answer_all = correct_all = np.array([])
 
-w = 1
-j = 0
-tr = 0
-
+w = 1           # To avoid repeat when detect trigger
+j = 0           # Question number
+tr = 0          # trial
 ##########################
-original = 'L'
-opposite = 'R'
+
 #----------------------------- Make the window for Psychopy -----------------------------#
 
-screen = visual.Window([960, 900],
-    screen = 0,
-    pos = [600,0],
-    fullscr = False,
-    winType = 'pyglet',
-    allowGUI = False,
-    allowStencil = False,
-    monitor ='testMonitor',
-    color = [-1,-1,-1],
-    blendMode = 'avg',
-    units = 'pix'
-    #pos = [100,0]
-                    )
+screen = visual.Window([960, 900], screen = 0, pos = [600,0], fullscr = False,
+                       winType = 'pyglet', allowGUI = False, allowStencil = False,
+                       monitor ='testMonitor', color = [-1,-1,-1], blendMode = 'avg',
+                       units = 'pix')
 
 #------------------------------------- Warm up --------------------------------------------#
 '''
 tic = time.perf_counter()
 toc = time.perf_counter()
-while toc-tic < 30:
+
+print("Warming up")
+port.write(b'2')
+while toc-tic < 30:         # During 60s
 
     input = board.get_board_data()
     eeg_data = input[eeg_channels, :]
     aux_data = input[aux_channels, :]
-    print(eeg_data)
+    print(aux_data)
 
     # If Nan value is entered, restart
     if True in np.isnan(eeg_data):
         print("Input NAN")
         break
+    key = event.getKeys()
+    if key == ["escape"]:
+        core.quit()
 
+    time.sleep(1)
     toc = time.perf_counter()
+
+print("Warming up End")
 '''
 
 #-------------------------------------- Intro ---------------------------------------------#
@@ -158,6 +154,8 @@ while tr < 30:   # 30
     aux_data = input[aux_channels, :]
     eeg_record = np.concatenate((eeg_record, eeg_data), axis=1)
     aux_record = np.concatenate((aux_record, aux_data), axis=1)
+    raw_data = np.concatenate((raw_data, eeg_data), axis=1)
+    tri_data = np.concatenate((tri_data, aux_data), axis=1)
     print(aux_data)
 
     #----------------------------- Trigger detection -----------------------------#
@@ -203,6 +201,8 @@ while tr < 30:   # 30
             # Stack data
             eeg_record = np.concatenate((eeg_record, eeg_data), axis=1)     # channel by time
             aux_record = np.concatenate((aux_record, aux_data), axis=1)
+            raw_data = np.concatenate((raw_data, eeg_data), axis=1)
+            tri_data = np.concatenate((tri_data, aux_data), axis=1)
 
             # Count time
             end = time.perf_counter()
@@ -355,6 +355,8 @@ while tr < 30:   # 30
         AUX_all = np.asarray(AUX)
         scipy.io.savemat(path + '/save_data/E.mat', {'EEG': EEG_all})
         scipy.io.savemat(path + '/save_data/A.mat', {'AUX': AUX_all})
+        scipy.io.savemat(path + '/save_data/RAW.mat', {'RAW': raw_data})
+        scipy.io.savemat(path + '/save_data/TRIGGER.mat', {'TRIGGER': tri_data})
         scipy.io.savemat(path + '/save_data/Accuracy.mat', {'Acc': ACC})
         correct_all = np.asarray(Correct)
         scipy.io.savemat(path + '/save_data/Behavior.mat', {'Behavior': correct_all})

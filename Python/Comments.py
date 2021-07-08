@@ -66,6 +66,9 @@ def Question(j, file, path, screen):
         correct.append("N")
 
     # Interval
+    text = visual.TextStim(screen, text=" + ", height=100, color=[1, 1, 1], wrapWidth=2000)
+    text.draw()
+    screen.flip()
     time.sleep(3)
 
     return correct, answer
@@ -75,36 +78,38 @@ def Question(j, file, path, screen):
 def Comments(tr,path, screen):
     file_2 = pd.read_excel(path + "/AAD/Python/Comments.xlsx")
 
-    try:
-        # Comment
-        for i in range(0, 11):
+    while True:
+        try:
+            # Comment
+            for i in range(0, 11):
 
-            if tr == 'intro':
+                if tr == 'intro':
+                    print("Intro & Train Session 1")
+                    text = visual.TextStim(screen, text=file_2.intro[i], height=50, color=[1, 1, 1], wrapWidth=2000)
 
-                text = visual.TextStim(screen, text=file_2.intro[i], height=50, color=[1, 1, 1], wrapWidth=2000)
+                elif tr+1 == 7:     # Train Session 2
+                    print("Train Seession 2")
+                    text = visual.TextStim(screen, text=file_2.train2[i], height=50, color=[1, 1, 1], wrapWidth=2000)
 
-            elif tr+1 == 7:     # Train Session 2
+                elif tr+1 == 14:    # Test session 1
+                    print("Test session 1")
+                    text = visual.TextStim(screen, text=file_2.test1[i], height=50, color=[1, 1, 1], wrapWidth=2000)
 
-                text = visual.TextStim(screen, text=file_2.train2[i], height=50, color=[1, 1, 1], wrapWidth=2000)
+                elif tr+1 == 20:    # Test session 2
+                    print("Test session 2")
+                    text = visual.TextStim(screen, text=file_2.test2[i], height=50, color=[1, 1, 1], wrapWidth=2000)
 
-            elif tr+1 == 14:    # Test session 1
+                elif tr+1 == 26:    # Test session 3
+                    print("Test session 3")
+                    text = visual.TextStim(screen, text=file_2.test3[i], height=50, color=[1, 1, 1], wrapWidth=2000)
 
-                text = visual.TextStim(screen, text=file_2.test1[i], height=50, color=[1, 1, 1], wrapWidth=2000)
+                text.draw()
+                screen.flip()
 
-            elif tr+1 == 20:    # Test session 2
+                key = event.waitKeys(keyList=["space", "escape"], clearEvents=True)
+                if key == ["escape"]:
+                    core.quit()
 
-                text = visual.TextStim(screen, text=file_2.test2[i], height=50, color=[1, 1, 1], wrapWidth=2000)
-
-            elif tr+1 == 26:    # Test session 3
-
-                text = visual.TextStim(screen, text=file_2.test3[i], height=50, color=[1, 1, 1], wrapWidth=2000)
-
-            text.draw()
-            screen.flip()
-
-            key = event.waitKeys(keyList=["space", "escape"], clearEvents=True)
-            if key == ["escape"]:
-                core.quit()
-
-    except:
-        pass
+        except:
+            pass
+            break
