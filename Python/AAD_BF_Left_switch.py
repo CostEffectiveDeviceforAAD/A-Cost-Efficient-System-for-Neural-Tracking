@@ -27,8 +27,8 @@ from Brainflow_stream import *
 
 
 #-------------------------------- SETTING ---------------------------------#
-#loc = 'kist'
-loc = 'hyu'
+loc = 'kist'
+#loc = 'hyu'
 
 if loc == 'kist':
     arduino = "COM8"
@@ -45,7 +45,7 @@ port = serial.Serial(arduino, 9600)
 # Connect Cyton with Brainflow network
 board, args = Brainflow_stream(cyton)       # kist : COM7 / hy: COM15
 
-###############
+##
 original = 'L'
 opposite = 'R'
 
@@ -59,8 +59,6 @@ stim_L = allspeech[:30, :]       # 30 by 3840   // trial by time
 stim_R = allspeech[30:, :]       # 30 by 3840   // trial by time
 
 #----------------------------- Parameter Setting -----------------------------#
-
-############## Exp parameter ################
 
 fs = 64
 tmin = 0
@@ -76,25 +74,39 @@ srate = board.get_sampling_rate(args.board_id)
 
 ##############################################
 # Set int
-r_L = r_R = Acc = ACC = []
-model_w = inter_w = entr_L = entr_R = []
-EEG = AUX = Correct = Answer = []
+
+r_L = []
+r_R = []
+Acc = []
+ACC = []
+model_w = []
+inter_w = []
+entr_L = []
+entr_R = []
+EEG = []
+AUX = []
+Correct = []
+Answer = []
 start = end = []
 
 # for trial array / for entire array
-eeg_record = raw_data= np.zeros((16,1))
-aux_record = tri_data = np.zeros((3,1))
-EEG_all = AUX_all = np.array([])
-answer_all = correct_all = np.array([])
+eeg_record = np.zeros((16,1))
+raw_data = np.zeros((16,1))
+aux_record = np.zeros((3,1))
+tri_data = np.zeros((3,1))
+EEG_all = np.array([])
+AUX_all = np.array([])
+answer_all = np.array([])
+correct_all = np.array([])
 
 w = 1           # To avoid repeat when detect trigger
 j = 0           # Question number
 tr = 0          # trial
-##########################
+##############################################
 
 #----------------------------- Make the window for Psychopy -----------------------------#
 
-screen = visual.Window([960, 900], screen = 1, pos = [600,0], fullscr = False,
+screen = visual.Window([960, 900], screen = 0, pos = [600,0], fullscr = True,
                        winType = 'pyglet', allowGUI = False, allowStencil = False,
                        monitor ='testMonitor', color = [-1,-1,-1], blendMode = 'avg',
                        units = 'pix')
@@ -106,16 +118,18 @@ toc = time.perf_counter()
 
 print("Warming up")
 port.write(b'2')
-while toc-tic < 20:         # During 60s
+while toc-tic < 10:         # During 20s
 
     input = board.get_board_data()
     eeg_data = input[eeg_channels, :]
     aux_data = input[aux_channels, :]
-    print(aux_data)
+    print(aux_data)     # Check input Trigger
 
     # If Nan value is entered, restart
     if True in np.isnan(eeg_data):
-        print("Input NAN")
+        print("******************")
+        print("Input NAN!")
+        print("******************")
         break
     key = event.getKeys()
     if key == ["escape"]:
@@ -129,16 +143,30 @@ print("Warming up End")
 #-------------------------------------- Intro ---------------------------------------------#
 file = pd.read_excel(path + "/AAD/Python/question.xlsx")
 file_2 = pd.read_excel(path + "/AAD/Python/Comments.xlsx")
+file_3 = pd.read_excel(path + "/AAD/Python/prePractice.xlsx")
 
 event.waitKeys(keyList=['space'], clearEvents=True)
 Comments('intro', path, screen)
+
+#---------------------------------------- Practice ----------------------------------------#
+# Comment
+text = visual.TextStim(screen, text=file_3.comment[0], height=37, color=[1, 1, 1], wrapWidth=1500)
+text.draw()
+screen.flip()
+event.waitKeys(keyList=['space'], clearEvents=True)
+
+for p in range(0,2):
+
+    port.write(b'3')  # practice speech
+    practice(p, path, screen)
 
 #==================================================================================================#
 #-------------------------------------- START EXPERIMENT ------------------------------------------#
 #==================================================================================================#
 
+Comments(tr, path, screen)
 #---------- Start 30 trial ----------#
-
+input = board.get_board_data()
 while tr < 30:   # 30
 
     #----------------------------- Psychopy Window & Serial Write ------------------------------#
@@ -146,7 +174,6 @@ while tr < 30:   # 30
         Direction(tr, original, opposite, screen, port)
         port.write(b'1')
         w = 0
-
 
     # Trigger detection
     input = board.get_board_data()
@@ -272,7 +299,7 @@ while tr < 30:   # 30
                     else:
                         acc = 0
 
-                    print("------ acc : {0} ------".format(acc))
+                    print("======= acc : {0} ".format(acc))
 
                     # Save acc for entire Accuracy
                     Acc = np.append(Acc, acc)
@@ -296,14 +323,15 @@ while tr < 30:   # 30
         #------------------------ End 60s - one trial ------------------------#
     ##### Question #####
         try:
-            if tr + 1 == file.TrNum[j]:
-                print("Question Time")
+            print("Question Time")
 
-                correct, answer = Question(j, file, path, screen)
+            correct, answer = Question(j, path, screen)
 
-                Correct.append(correct)
-                Answer.append(answer)
-                j = j+1
+            Correct.append(correct)
+            Answer.append(answer)
+            #Correct.append(correct)
+            Answer.append(answer)
+            j = j+1
         except KeyError:                # 마지막 질문 후 에러나서
             pass
 
@@ -357,12 +385,11 @@ while tr < 30:   # 30
         correct_all = np.asarray(Correct)
         scipy.io.savemat(path + '/save_data/Behavior.mat', {'Behavior': correct_all})
 
-        #----------------------- Comments ---------------------------------#
-
-        Comments(tr, path, screen)
-
-        tr = tr
+        tr = tr+1
         w = 1
+
+        #------------------ comment about session ---------------------#
+        Comments(tr, path, screen)
 
 #----------------------------- 30 trial End -----------------------------#
 

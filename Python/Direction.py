@@ -29,7 +29,7 @@ def Direction(tr, original, opposite, screen, port):
     origin = globals()['text_{}3'.format(original)]
     opposite = globals()['text_{}3'.format(opposite)]
 
-    if ( tr+1 >= 1 and tr <= 7 ) or (tr+1 >= 15 and tr+1 <= 17) or (tr+1 == 22 or tr+1 ==23 or tr+1 == 26) or (tr+1 == 27 or tr+1 == 30):      # Represent Origin direction
+    if ( tr+1 >= 1 and tr+1 <= 7 ) or (tr+1 >= 15 and tr+1 <= 17) or (tr+1 == 22 or tr+1 ==23 or tr+1 == 26) or (tr+1 == 27 or tr+1 == 30):      # Represent Origin direction
         # Train 1 set               //     Test session 1 - 3       //    Test session 2 - 3                 //  Test sesstion 3 - standard / opposite
 
         text_c.draw()       # Draw Fixation
@@ -68,56 +68,56 @@ def switching(tr, check, original, opposi, screen):
 
         if tr+1 == 27:  # 31s   # origin / opposite
 
-            if check == 29:
+            if check == 28:
                 origin = globals()['text_{}2'.format(original)]
                 origin.draw()
                 screen.flip()
-            if check == 30:
+            if check == 29:
                 origin = globals()['text_{}1'.format(original)]
                 origin.draw()
                 screen.flip()
-            if check == 31:
+            if check == 30:
                 opposite.draw()
                 screen.flip()
 
         if tr+1 == 28:  # 32s   # opposite / origin
 
-            if check == 30:
+            if check == 29:
                 opposite = globals()['text_{}2'.format(opposi)]
                 opposite.draw()
                 screen.flip()
-            if check == 31:
+            if check == 30:
                 opposite = globals()['text_{}1'.format(opposi)]
                 opposite.draw()
                 screen.flip()
-            if check == 32:
+            if check == 31:
                 origin.draw()
                 screen.flip()
 
         if tr+1 == 29:  # 34s   # opposite / origin
 
-            if check == 32:
+            if check == 31:
                 opposite = globals()['text_{}2'.format(opposi)]
                 opposite.draw()
                 screen.flip()
-            if check == 33:
+            if check == 32:
                 opposite = globals()['text_{}1'.format(opposi)]
                 opposite.draw()
                 screen.flip()
-            if check == 34:
+            if check == 33:
                 origin.draw()
                 screen.flip()
 
         if tr+1 == 30:  # 28s   # origin / opposite
 
-            if check == 26:
+            if check == 25:
                 origin = globals()['text_{}2'.format(original)]
                 origin.draw()
                 screen.flip()
-            if check == 27:
+            if check == 26:
                 origin = globals()['text_{}1'.format(original)]
                 origin.draw()
                 screen.flip()
-            if check == 28:
+            if check == 27:
                 opposite.draw()
                 screen.flip()

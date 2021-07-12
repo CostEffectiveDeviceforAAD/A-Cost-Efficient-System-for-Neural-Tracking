@@ -38,6 +38,7 @@ void setup() {
 
 int input = 0;
 int track = 2;
+int prac = 32;
 
 int thres = 11 ;
 
@@ -89,7 +90,7 @@ void loop() {
       
     }
   }
-  else if (input == 50){
+  else if (input == 50){  // warm up
     wTrig.trackPlaySolo(1);
 
       while(true){
@@ -115,6 +116,19 @@ void loop() {
         } 
      }
   }
+  else if (input == 51){    // practice
+    wTrig.trackPlaySolo(prac);
+
+        // Check LED (ouside)
+        digitalWrite(10,HIGH);
+        // Play Wav file during 63s 
+        delay(15000);     
+        
+        // for next track
+        prac++;
+        
+      } 
 }
+
 
               
