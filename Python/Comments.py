@@ -21,14 +21,24 @@ def practice(p, path, screen):
     text.draw()
     screen.flip()
 
-    event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
+    key1 = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
+    if key1 == 3:
+        print("True")
+    else:
+        print("False")
 
     # Question 2
     text = visual.TextStim(screen, text = file.journey_Q1_practice[p], height=50, color=[1, 1, 1], wrapWidth=1500)
     text.draw()
     screen.flip()
 
-    event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
+    key2 = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
+    if p == 0 and key2 == 2:
+        print("True")
+    elif p == 1 and key2 == 4:
+        print("True")
+    else:
+        print("False")
 
     text = visual.TextStim(screen, text = "+", height=100, color=[1, 1, 1], wrapWidth=1500)
     text.draw()
@@ -38,6 +48,7 @@ def practice(p, path, screen):
 
 def Question(j, path, screen):
     correct = []
+    answer = []
     file = pd.read_excel(path + "/AAD/Python/question.xlsx")
 
     try :

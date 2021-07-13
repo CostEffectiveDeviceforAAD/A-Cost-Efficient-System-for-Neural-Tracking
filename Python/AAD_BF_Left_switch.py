@@ -27,8 +27,13 @@ from Brainflow_stream import *
 
 
 #-------------------------------- SETTING ---------------------------------#
-loc = 'kist'
-#loc = 'hyu'
+
+#########
+subject = '_01LJW'
+###########
+
+#loc = 'kist'
+loc = 'hyu'
 
 if loc == 'kist':
     arduino = "COM8"
@@ -43,7 +48,7 @@ elif loc == 'hyu':
 port = serial.Serial(arduino, 9600)
 
 # Connect Cyton with Brainflow network
-board, args = Brainflow_stream(cyton)       # kist : COM7 / hy: COM15
+board, args = Brainflow_stream(cyton)
 
 ##
 original = 'L'
@@ -87,8 +92,8 @@ EEG = []
 AUX = []
 Correct = []
 Answer = []
-start = end = []
-
+start = []
+end = []
 # for trial array / for entire array
 eeg_record = np.zeros((16,1))
 raw_data = np.zeros((16,1))
@@ -106,7 +111,7 @@ tr = 0          # trial
 
 #----------------------------- Make the window for Psychopy -----------------------------#
 
-screen = visual.Window([960, 900], screen = 0, pos = [600,0], fullscr = True,
+screen = visual.Window([960, 900], screen = 0, pos = [600,0], fullscr = False,
                        winType = 'pyglet', allowGUI = False, allowStencil = False,
                        monitor ='testMonitor', color = [-1,-1,-1], blendMode = 'avg',
                        units = 'pix')
@@ -294,7 +299,7 @@ while tr < 30:   # 30
                     r_R = np.append(r_R, r_r)
 
                     ###### Estimate accuracy #####
-                    if r_r > r_l:
+                    if r_l > r_r:
                         acc = 1
                     else:
                         acc = 0
@@ -377,13 +382,13 @@ while tr < 30:   # 30
         # Save per trial // eeg, trigger, accuracy ,behavior
         EEG_all = np.asarray(EEG)
         AUX_all = np.asarray(AUX)
-        scipy.io.savemat(path + '/save_data/E.mat', {'EEG': EEG_all})
-        scipy.io.savemat(path + '/save_data/A.mat', {'AUX': AUX_all})
-        scipy.io.savemat(path + '/save_data/RAW.mat', {'RAW': raw_data})
-        scipy.io.savemat(path + '/save_data/TRIGGER.mat', {'TRIGGER': tri_data})
-        scipy.io.savemat(path + '/save_data/Accuracy.mat', {'Acc': ACC})
+        scipy.io.savemat(path + '/save_data/E'+subject+'.mat', {'EEG': EEG_all})
+        scipy.io.savemat(path + '/save_data/A'+subject+'.mat', {'AUX': AUX_all})
+        scipy.io.savemat(path + '/save_data/RAW'+subject+'.mat', {'RAW': raw_data})
+        scipy.io.savemat(path + '/save_data/TRIGGER'+subject+'.mat', {'TRIGGER': tri_data})
+        scipy.io.savemat(path + '/save_data/Accuracy'+subject+'.mat', {'Acc': ACC})
         correct_all = np.asarray(Correct)
-        scipy.io.savemat(path + '/save_data/Behavior.mat', {'Behavior': correct_all})
+        scipy.io.savemat(path + '/save_data/Behavior'+subject+'.mat', {'Behavior': correct_all})
 
         tr = tr+1
         w = 1
@@ -408,15 +413,15 @@ board.release_session()
 #### save ####
 # mat save
 answer_all = np.asarray(Answer)
-scipy.io.savemat(path + '/save_data/Answer.mat', {'Answer': answer_all})
+scipy.io.savemat(path + '/save_data/Answer'+subject+'.mat', {'Answer': answer_all})
 
 # np save
-np.save(path+'/save_data/EEG', EEG_all)
-np.save(path+'/save_data/A', AUX_all)
-np.save(path+'/save_data/All_Accuracy', ACC)
+np.save(path+'/save_data/EEG'+subject, EEG_all)
+np.save(path+'/save_data/A'+subject, AUX_all)
+np.save(path+'/save_data/All_Accuracy'+subject, ACC)
 entr_L = np.asarray(entr_L)
 entr_R = np.asarray(entr_R)
-np.save(path+'/save_data/All_correlation_right', entr_R)
-np.save(path+'/save_data/All_correlation_left', entr_L )
+np.save(path+'/save_data/All_correlation_right'+subject, entr_R)
+np.save(path+'/save_data/All_correlation_left'+subject, entr_L )
 
                             
