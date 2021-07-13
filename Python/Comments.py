@@ -22,7 +22,7 @@ def practice(p, path, screen):
     screen.flip()
 
     key1 = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
-    if key1 == 3:
+    if key1 == ["3"]:
         print("True")
     else:
         print("False")
@@ -33,9 +33,9 @@ def practice(p, path, screen):
     screen.flip()
 
     key2 = event.waitKeys(keyList=['1', '2', '3', '4'], clearEvents=True)
-    if p == 0 and key2 == 2:
+    if p == 0 and key2 == ["2"]:
         print("True")
-    elif p == 1 and key2 == 4:
+    elif p == 1 and key2 == ["4"]:
         print("True")
     else:
         print("False")
@@ -62,8 +62,10 @@ def Question(j, path, screen):
         answer.append(key)
         if file.tweenty_A1[j] == int(key[0]):
             correct.append("T")
+            print("True")
         else:
             correct.append("F")
+            print("False")
 
         # Question 2
         text3 = visual.TextStim(screen, text = file.tweenty_Q2[j], height=50, color=[1, 1, 1], wrapWidth=1500)
@@ -75,8 +77,10 @@ def Question(j, path, screen):
         answer.append(key)
         if file.tweenty_A2[j] == int(key[0]):
             correct.append("T")
+            print("True")
         else:
             correct.append("F")
+            print("False")
 
         # Question 3
         text3 = visual.TextStim(screen, text = file.journey_Q1[j], height=50, color=[1, 1, 1], wrapWidth=1500)
@@ -88,8 +92,10 @@ def Question(j, path, screen):
         answer.append(key)
         if file.journey_A1[j] == int(key[0]):
             correct.append("T")
+            print("True")
         else:
             correct.append("F")
+            print("False")
 
         # Question 4
         text3 = visual.TextStim(screen, text = file.journey_Q2[j], height=50, color=[1, 1, 1], wrapWidth=1500)
@@ -101,8 +107,10 @@ def Question(j, path, screen):
         answer.append(key)
         if file.journey_A2[j] == int(key[0]):
             correct.append("T")
+            print("True")
         else:
             correct.append("F")
+            print("False")
 
     except:
         correct.append("N")
@@ -121,6 +129,8 @@ def Comments(tr,path, screen):
     n = []
     i=0
     file_2 = pd.read_excel(path + "/AAD/Python/Comments.xlsx")
+    text2 = visual.TextStim(screen, text="'스페이스 바' 를 누르시면 다음 페이지로 넘어갑니다.", pos=(0, -230), height=33,
+                            color=[1, 1, 1], wrapWidth=1500)
 
     try:
         # Comment
@@ -135,6 +145,7 @@ def Comments(tr,path, screen):
                 print("Train Seession 1  ")
                 text = visual.TextStim(screen, text=file_2.train1[i], height=37, color=[1, 1, 1], wrapWidth=1500)
                 n = file_2.train1[i]
+
 
             elif tr == 7:     # Train Session 2
                 print("Train Seession 2")
@@ -155,11 +166,14 @@ def Comments(tr,path, screen):
                 print("Test session 3")
                 text = visual.TextStim(screen, text=file_2.test3[i], height=37, color=[1, 1, 1], wrapWidth=1500)
                 n = file_2.test3[i]
+                text2 = visual.TextStim(screen, text="", pos=(0, -320), height=33,
+                                        color=[1, 1, 1], wrapWidth=1500)
 
             try:
                 np.isnan(n)
                 break
             except:
+                text2.draw()
                 text.draw()
                 screen.flip()
 

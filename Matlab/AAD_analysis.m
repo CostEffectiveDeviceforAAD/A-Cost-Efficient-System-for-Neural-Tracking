@@ -2,8 +2,8 @@
 
 %% Accuracy Plot
 %% Accuracy
-sub = '_01_LJW'
-subject = 5
+sub = '_01LJW'
+subject = 1
 file = strcat('Accuracy',sub, '.mat');
 load(file)  % Acc
 
@@ -31,7 +31,7 @@ title('Sub1')
 
 %% multi subject
 
-C = readtable('result_sample.xlsx');
+%C = readtable('result_sample.xlsx');
 Y = []
 X = []
 
