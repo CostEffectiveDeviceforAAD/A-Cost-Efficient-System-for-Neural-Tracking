@@ -29,8 +29,8 @@ from Brainflow_stream import *
 subject = '_01LJW'
 ###########
 
-# loc = 'kist'
-loc = 'hyu'
+loc = 'kist'
+#loc = 'hyu'
 
 if loc == 'kist':
     arduino = "COM8"
@@ -108,7 +108,7 @@ tr = 0  # trial
 
 # ----------------------------- Make the window for Psychopy -----------------------------#
 
-screen = visual.Window([960, 900], screen=0, pos=[600, 0], fullscr=True,
+screen = visual.Window([960, 900], screen=1, pos=[600, 0], fullscr=True,
                        winType='pyglet', allowGUI=False, allowStencil=False,
                        monitor='testMonitor', color=[-1, -1, -1], blendMode='avg',
                        units='pix')
@@ -128,7 +128,7 @@ while toc - tic < 10:  # During 20s
     print(aux_data)  # Check input Trigger
 
     # If Nan value is entered, restart
-    if True in np.isnan(eeg_data):
+    if True in np.isnan(np.asarray(eeg_data)):
         print("******************")
         print("Input NAN!")
         print("******************")
@@ -152,7 +152,7 @@ Comments('intro', path, screen)
 
 # ---------------------------------------- Practice ----------------------------------------#
 # Comment
-text = visual.TextStim(screen, text=file_3.comment[0], height=37, color=[1, 1, 1], wrapWidth=1500)
+text = visual.TextStim(screen, text=file_3.comment[0], height=50, color=[1, 1, 1], wrapWidth=2000)
 text.draw()
 screen.flip()
 event.waitKeys(keyList=['space'], clearEvents=True)
@@ -180,9 +180,9 @@ while tr < 30:  # 30
     input = board.get_board_data()
     eeg_data = input[eeg_channels, :]
     aux_data = input[aux_channels, :]
-    eeg_record = np.concatenate((eeg_record, eeg_data), axis=1)
+    eeg_record = np.concatenate((eeg_record, -eeg_data), axis=1)
     aux_record = np.concatenate((aux_record, aux_data), axis=1)
-    raw_data = np.concatenate((raw_data, eeg_data), axis=1)
+    raw_data = np.concatenate((raw_data, -eeg_data), axis=1)
     tri_data = np.concatenate((tri_data, aux_data), axis=1)
     print(aux_data)
 
@@ -232,9 +232,9 @@ while tr < 30:  # 30
             print("INPUT : {0}".format(len(eeg_data.T)))
 
             # Stack data
-            eeg_record = np.concatenate((eeg_record, eeg_data), axis=1)  # channel by time
+            eeg_record = np.concatenate((eeg_record, -eeg_data), axis=1)  # channel by time
             aux_record = np.concatenate((aux_record, aux_data), axis=1)
-            raw_data = np.concatenate((raw_data, eeg_data), axis=1)
+            raw_data = np.concatenate((raw_data, -eeg_data), axis=1)
             tri_data = np.concatenate((tri_data, aux_data), axis=1)
 
             # Count time

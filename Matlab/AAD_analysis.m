@@ -14,6 +14,9 @@ fixed = mean(Acc(1:12)*100);
 switching = mean(Acc(13:16)*100);
 
 data = [C; table(subject,overall, fixed, switching)]
+
+chance = 52.99
+
 %%
 writetable(data, 'result_sample.xlsx');
 
@@ -27,6 +30,7 @@ b = bar(X, Y);
 grid on
 ylim([0 100])
 ylabel('Accuracy(%)')
+% refline([0, chance]);
 title('Sub1')
 
 %% multi subject

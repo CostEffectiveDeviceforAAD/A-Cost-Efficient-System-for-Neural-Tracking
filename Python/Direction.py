@@ -6,15 +6,15 @@ import time
 
 def text(screen):
 
-    text_R3 = visual.TextStim(screen, text=">>>", height=100, color=[1, 1, 1])
-    text_R2 = visual.TextStim(screen, text=">>", height=100, color=[1, 1, 1])
-    text_R1 = visual.TextStim(screen, text=">", height=100, color=[1, 1, 1])
+    text_R3 = visual.TextStim(screen, text=">>>", height=150, color=[1, 1, 1])
+    text_R2 = visual.TextStim(screen, text=">>", height=150, color=[1, 1, 1])
+    text_R1 = visual.TextStim(screen, text=">", height=150, color=[1, 1, 1])
 
-    text_L3 = visual.TextStim(screen, text="<<<", height=100, color=[1, 1, 1])
-    text_L2 = visual.TextStim(screen, text="<<", height=100, color=[1, 1, 1])
-    text_L1 = visual.TextStim(screen, text="<", height=100, color=[1, 1, 1])
+    text_L3 = visual.TextStim(screen, text="<<<", height=150, color=[1, 1, 1])
+    text_L2 = visual.TextStim(screen, text="<<", height=150, color=[1, 1, 1])
+    text_L1 = visual.TextStim(screen, text="<", height=150, color=[1, 1, 1])
 
-    text_c = visual.TextStim(screen, text=" + ", height=100, color=[1, 1, 1])
+    text_c = visual.TextStim(screen, text=" + ", height=150, color=[1, 1, 1])
 
     return text_R3, text_R2, text_R1, text_L3, text_L2, text_L1, text_c
 
