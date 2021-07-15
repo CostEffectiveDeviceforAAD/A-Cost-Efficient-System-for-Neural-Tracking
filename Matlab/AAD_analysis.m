@@ -65,6 +65,12 @@ legend('overall','fixed','switching');
 ylim([0 80])
 ylabel('Accuracy(%)')
 xlabel('Subject')
+%%
+train = 14;
+
+train_trial_ori = mean(Acc(1:train));
+test_ori = mean(Acc(train+1:30));
+train_mean_ori = mean(Acc(31:end));
 
 %% Envelope
 load 'Predict_L.mat'
