@@ -73,7 +73,7 @@ i = 20;
 L = 960;
 x = linspace(0, L/64, L);
 %%
-for i = 1:5
+for i = 15:20
     figure()
     subplot(311)
     plot(x, Allspeech(31+i,1:960)')
@@ -87,12 +87,12 @@ for i = 1:5
 end
 
 %% 겹치기-att
-for (i = 9) %&& (i = 24:25)
+for (i = 19:20) %&& (i = 24:25)
     figure()
     plot(x, Allspeech(31+i,1:64*(15))', 'r'); hold on
-    plot(x, (Pre_L{1+i}(1,:))', 'b')
+    plot(x, (Pre_L{1+i}(1,:)*3)', 'b')
     legend('Speech', 'Predicted')
-    title(strcat('Trial - ', num2str(i)))
+    title(strcat('Title-', i))
 end
 %%
 for (i = 16:20)

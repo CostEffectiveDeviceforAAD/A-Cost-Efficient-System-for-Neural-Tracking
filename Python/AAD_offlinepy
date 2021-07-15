@@ -258,8 +258,8 @@ while tr < 30:  # 30
 
                 # ----------------------------- Pre-processing -----------------------------#
                 # preprocessing_ha.py
-                ## order 조정필요.
-                win = Preproccessing(win, srate, 0.5, 8, 375)  # data, sampling rate, low-cut, high-cut, filter order
+
+                win = Preproccessing(win, srate, 0.5, 8, 3)  # data, sampling rate, low-cut, high-cut, filter order
                 data_l = len(win.T)
 
                 # ------------------------------- Train set -------------------------------#
@@ -267,7 +267,7 @@ while tr < 30:  # 30
                     state = "Train set"
 
                     ## mTRF train function ##
-                    model, tlag, inter = mtrf_train(stim_L[tr:tr + 1, 64 * (i):64 * (i) + data_l].T, win.T, fs, Dir,
+                    model, tlag, inter = mtrf_train(stim_R[tr:tr + 1, 64 * (i):64 * (i) + data_l].T, win.T, fs, Dir,
                                                     tmin, tmax, reg_lambda)
 
                     'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'
