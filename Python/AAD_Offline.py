@@ -19,9 +19,7 @@ from psychopy import visual, core, event
 from preprocessing_ha import *
 from Comments import *
 from Direction import *
-from brainflow.board_shim import BoardShim, BrainFlowInputParams, BoardIds, BrainFlowError, LogLevels
-from brainflow.data_filter import DataFilter, FilterTypes, AggOperations, WindowFunctions, DetrendOperations
-from Brainflow_stream import *
+
 
 # -------------------------------- SETTING ---------------------------------#
 
@@ -29,17 +27,13 @@ from Brainflow_stream import *
 subject = ''
 ###########
 
-#loc = 'kist'
-loc = 'hyu'
+loc = 'kist'
+#loc = 'hyu'
 
 if loc == 'kist':
-    arduino = "COM8"
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
-    cyton = 'COM7'
 elif loc == 'hyu':
-    arduino = "COM4"  # casing COM4 // File box COM10
     path = 'C:/Users/user/Desktop/hy-kist/OpenBCI'
-    cyton = 'COM3'  # casing COM3 // File box COM14
 
 
 # ----------------------------- Load Speech segment data ------------------------------#
@@ -53,10 +47,10 @@ stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
 # Load data
 
-raw_mat = io.loadmat('C:/Users/user/Desktop/hy-kist/OpenBCI/0714_LJW/RAW_01LJW.mat')
+raw_mat = io.loadmat(path + '/0714_LJW/RAW_01LJW.mat')
 raw = raw_mat['RAW']        # channel by time
 raw = np.concatenate((raw, np.ones([16,100])), axis=1)
-tri_mat = io.loadmat('C:/Users/user/Desktop/hy-kist/OpenBCI/0714_LJW/TRIGGER_01LJW.mat')
+tri_mat = io.loadmat(path + '/0714_LJW/TRIGGER_01LJW.mat')
 tri = tri_mat['TRIGGER']    # 3 by time
 
 
@@ -144,7 +138,7 @@ while tr < 30:  # 30
         # ----------------------------- Pre-processing -----------------------------#
         # preprocessing_ha.py
 
-        win = Preproccessing(win, srate, 0.5, 8, 3)  # data, sampling rate, low-cut, high-cut, filter order
+        win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
 
         # ------------------------------- Train set -------------------------------#
         if tr < train:  # int train
@@ -294,7 +288,7 @@ for tr in range(0,train):
     for i in range(0,46):
 
         win = raw[:, speech + srate * (i): speech + srate * (15 + i)]
-        win = Preproccessing(win, srate, 0.5, 8, 3)
+        win = Preproccessing(win, srate, 0.5, 8, 601)
 
         ## Calculate Predicted signal ##
         pred_l, r_l, p, mse = mtrf_predict(stim_L[tr:tr + 1, 64 * (i): 64 * (15 + i)].T, win.T, model, fs,

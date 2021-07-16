@@ -11,19 +11,22 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order):   # IIR
     nyq = 0.5 * fs
     low = lowcut/nyq
     high = highcut/nyq
-    b, a = butter(order, [low, high], btype='band')
+    b, a = signal.butter(order, [low, high], btype='band')
     y = filtfilt(b, a, data)
     return y
 
 def FIR_filter(data, lowcut, highcut, fs, order):   # FIR
     nyq = 0.5 * fs
-    low = lowcut/nyq
-    high = highcut/nyq
-    #b, a = butter(order, [low, high], btype='band')
-    b = signal.firwin(order, [low, high], window='hamming', pass_zero='bandpass')
-    y = lfilter(b, 1.0, data)
+    #low = lowcut/nyq
+    #high = highcut/nyq
+    b = signal.firwin(order, [lowcut, highcut], window='hamming', pass_zero='bandpass', nyq = nyq)   # filter design
+    #y = signal.lfilter(b, 1.0, data)
+    y = filtfilt(b, 1.0, data)
     return y
 
+#4 Filter order = /Normalised width of transition band
+
+#print("a")
 def Preproccessing(win,srate, low, high, order):
 
     #### Re-reference ####
@@ -34,9 +37,9 @@ def Preproccessing(win,srate, low, high, order):
     #### Filtering ####
 
     # FIR
-    #win = FIR_filter(win, low, high, srate, order)  # order 조정필요.
+    win = FIR_filter(win, low, high, srate, order)  # order 조정필요.
     # IIR
-    win = butter_bandpass_filter(win, low, high, srate, order)
+    #win = butter_bandpass_filter(win, low, high, srate, order)
 
     #### Resampling ####
 
@@ -67,3 +70,4 @@ def mfreqz(b,a=1):
     title(r'Phase response')
     subplots_adjust(hspace=0.5)
 
+print("a")

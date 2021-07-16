@@ -66,10 +66,11 @@ ylim([0 80])
 ylabel('Accuracy(%)')
 xlabel('Subject')
 %%
-train = 14;
+clear
 
-train_trial_ori = mean(Acc(1:train));
-test_ori = mean(Acc(train+1:30));
+load 'Accuracy.mat'
+train_trial_ori = mean(Acc(1:14));
+test_ori = mean(Acc(15:30));
 train_mean_ori = mean(Acc(31:end));
 
 %% Envelope
