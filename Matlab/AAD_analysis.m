@@ -68,10 +68,21 @@ xlabel('Subject')
 %%
 clear
 
-load 'Accuracy.mat'
+load 'Accuracy.mat' 
 train_trial_ori = mean(Acc(1:14));
 test_ori = mean(Acc(15:30));
 train_mean_ori = mean(Acc(31:end));
+
+%%
+clear
+
+load 'Accuracy.mat' 
+test_Acc(1) = mean(Acc{1}(15:30));
+train_Acc(1) = mean(Acc{1}(31:end));
+for i = 2:16
+    test_Acc(i) = mean(Acc{i}(1:16));
+    train_Acc(i) = mean(Acc{i}(17:end));
+end
 
 %% Envelope
 load 'Predict_L.mat'

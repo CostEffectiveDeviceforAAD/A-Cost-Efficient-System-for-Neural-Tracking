@@ -55,10 +55,10 @@ opposite = 'R'
 
 # Load All speech
 allspeech = np.load(path + '/AAD/Python/Allspeech.npy')
-# 60 by 3840  /1-30 : left by time / 31-60 righy by time // srat : 64
+# 60 by 3840  /1-30 : Twenty by time / 31-60 Journey by time // srat : 64
 
-stim_L = allspeech[:30, :]  # 30 by 3840   // trial by time
-stim_R = allspeech[30:, :]  # 30 by 3840   // trial by time
+stim_R = allspeech[:30, :]  # 30 by 3840   // trial by time
+stim_L = allspeech[30:, :]  # 30 by 3840   // trial by time
 
 # ----------------------------- Parameter Setting -----------------------------#
 

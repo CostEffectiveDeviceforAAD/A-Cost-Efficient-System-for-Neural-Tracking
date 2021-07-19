@@ -70,4 +70,3 @@ def mfreqz(b,a=1):
     title(r'Phase response')
     subplots_adjust(hspace=0.5)
 
-print("a")
