@@ -27,8 +27,8 @@ from Direction import *
 subject = ''
 ###########
 
-loc = 'kist'
-#loc = 'hyu'
+#loc = 'kist'
+loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -111,204 +111,107 @@ for i in range(0, len(ind) - 1):
         onset.append(ind[i])
 onset.append(ind[len(ind) - 1])
 
-for ch in range(0,16):
+#for ch in [5,11]:
 
-    while tr < 30:  # 30
+while tr < 30:  # 30
 
-        # ----------------------------- Trigger detection -----------------------------#
-        # per trial
+    # ----------------------------- Trigger detection -----------------------------#
+    # per trial
 
-        # Format per trial
-        i = 0  # Window number
-        Acc = []
-        predic_l = []
-        predic_r = []
+    # Format per trial
+    i = 0  # Window number
+    Acc = []
+    predic_l = []
+    predic_r = []
 
-        #raw = eeg[:60,:,tr]
-        # ----------------------------- Working while 60s -----------------------------#
+    #raw = eeg[:60,:,tr]
+    # ----------------------------- Working while 60s -----------------------------#
 
-        # onset 부터 3초 지나고 원하는 시간(한 trial) 동안 돌아가도록
-        speech = onset[tr] + (srate * 3) + 1  # 3초 후 부터가 speech 이기에 +1
-        #speech = 0
-        while i != 46:  # 46 번째 window 까지 (0~45)
+    # onset 부터 3초 지나고 원하는 시간(한 trial) 동안 돌아가도록
+    speech = onset[tr] + (srate * 3) + 1  # 3초 후 부터가 speech 이기에 +1
+    #speech = 0
+    while i != 46:  # 46 번째 window 까지 (0~45)
 
-            # RAW data
+        # RAW data
 
-            win = raw[:, speech+srate*(i) : speech+srate*(15 + i)]
+        win = raw[:, speech+srate*(i) : speech+srate*(15 + i)]
 
-            # ----------------------------- Pre-processing -----------------------------#
-            # preprocessing_ha.py
+        # ----------------------------- Pre-processing -----------------------------#
+        # preprocessing_ha.py
 
-            win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
+        win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
 
-            # Select channel
-            win = win[[ch,3,4,8,11,12],:]
+        # Select channel
+        win = win[[0,1,2,3,4,5,8,9,10,11,12,13,14,15],:]
 
-            # ------------------------------- Train set -------------------------------#
-            if tr < train:  # int train
-                state = "Train set"
+        # ------------------------------- Train set -------------------------------#
+        if tr < train:  # int train
+            state = "Train set"
 
-                ## mTRF train function ##
-                model, tlag, inter = mtrf_train(stim_L[tr:tr + 1, 64 * (i) : 64 * (15 + i)].T, win.T, fs, Dir,
-                                                tmin, tmax, reg_lambda)
+            ## mTRF train function ##
+            model, tlag, inter = mtrf_train(stim_L[tr:tr + 1, 64 * (i) : 64 * (15 + i)].T, win.T, fs, Dir,
+                                            tmin, tmax, reg_lambda)
 
-                'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'
+            'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'
 
-                #================================================================
+            #================================================================
 
-                pred_l, r_l, p, mse = mtrf_predict(stim_L[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
-                                                 Dir, tmin, tmax, inter)
-                pred_r, r_r, p, mse = mtrf_predict(stim_R[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
-                                                 Dir, tmin, tmax, inter)
-
-                predic_l.append(pred_l)
-                predic_r.append(pred_r)
-
-                print("Train")
-                # Stock correlation value per window(i)
-                r_L = np.append(r_L, r_l)
-                r_R = np.append(r_R, r_r)
-
-                ######  Estimate accuracy  #####
-                if r_l > r_r:
-                    acc = 1
-                else:
-                    acc = 0
-
-                print("======= acc : {0} ".format(acc))
-
-                # Save acc for entire Accuracy
-                Acc = np.append(Acc, acc)
-
-                #===========================================================================
-
-
-                # Sum w - window
-                if i == 0:
-                    model_w = model
-                    inter_w = inter
-                else:  # i > 0 - 45까지
-                    model_w = np.add(model_w, model)
-                    inter_w = np.add(inter_w, inter)
-
-                i = i + 1
-
-            # ------------------------------- Test set -------------------------------#
-            else:
-                state = "Test set"
-
-                ## Calculate Predicted signal ##
-                pred_l, r_l, p, mse = mtrf_predict(stim_L[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
-                                                 Dir, tmin, tmax, inter)
-                pred_r, r_r, p, mse = mtrf_predict(stim_R[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
-                                                 Dir, tmin, tmax, inter)
-
-                predic_l.append(pred_l)
-                predic_r.append(pred_r)
-
-                print("Test")
-                # Stock correlation value per window(i)
-                r_L = np.append(r_L, r_l)
-                r_R = np.append(r_R, r_r)
-
-                ######  Estimate accuracy  #####
-                if r_l > r_r:
-                    acc = 1
-                else:
-                    acc = 0
-
-                print("======= acc : {0} ".format(acc))
-
-                # Save acc for entire Accuracy
-                Acc = np.append(Acc, acc)
-
-                # Up window number
-                i = i + 1
-
-            # -- End one windo --w
-
-        # ------------------------ End 60s - one trial ------------------------#
-
-        ###### The things that have to calculate per trial ######
-        ## Add model_w case train
-        if state == "Train set":
-            if tr == 0:
-                model_wt = model_w
-                inter_wt = inter_w
-            elif tr > 0:
-                model_wt = np.add(model_wt, model_w)
-                inter_wt = np.add(inter_wt, inter_w)
-
-            # Average at last train trial
-            if tr == 13:
-                model_wm = model_wt / (46 * 14)
-                inter_wm = inter_wt / (46 * 14)
-                model = model_wm
-                inter = inter_wm
-
-            #=============================================================
-
-            print("Train_check_trial")  # 당연히 높게 나와야함
-            ACC = np.append(ACC, np.mean(Acc))
-            Pre_L.append(predic_l)
-            Pre_R.append(predic_r)
-            print("\n==================================\n")
-            print("Present Accuracy = {0}%".format(ACC[-1] * 100))
-            print("\n==================================\n")
-
-            #=============================================================
-        elif state == "Test set":
-            # Stack correlation value collected during one trial
-            entr_L.append(r_L)
-            entr_R.append(r_R)
-
-            r_L = []
-            r_R = []
-
-            # Collect Accuracy per trial
-            ACC = np.append(ACC, np.mean(Acc))
-            Pre_L.append(predic_l)
-            Pre_R.append(predic_r)
-            print("\n==================================\n")
-            print("Present Accuracy = {0}%".format(ACC[-1] * 100))
-            print("\n==================================\n")
-
-        print(tr)
-        tr = tr + 1
-        w = 1
-
-
-    # ----------------------------- 30 trial End -----------------------------#
-    ######################################################################################
-    for tr in range(0,train):
-        Acc = []
-        speech = onset[tr] + (srate * 3) + 1
-
-        #raw = eeg[:60, :, tr]
-
-        for i in range(0,46):
-
-            win = raw[:, speech + srate * (i): speech + srate * (15 + i)]
-            win = Preproccessing(win, srate, 0.5, 8, 601)
-
-            # Select channel
-            win = win[[ch,3,4,8,11,12],:]
-
-            ## Calculate Predicted signal ##
-            pred_l, r_l, p, mse = mtrf_predict(stim_L[tr:tr + 1, 64 * (i): 64 * (15 + i)].T, win.T, model, fs,
+            pred_l, r_l, p, mse = mtrf_predict(stim_L[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
                                              Dir, tmin, tmax, inter)
-            pred_r, r_r, p, mse = mtrf_predict(stim_R[tr:tr + 1, 64 * (i): 64 * (15 + i)].T, win.T, model, fs,
+            pred_r, r_r, p, mse = mtrf_predict(stim_R[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
                                              Dir, tmin, tmax, inter)
 
             predic_l.append(pred_l)
             predic_r.append(pred_r)
 
-            print("Train check")
+            print("Train")
             # Stock correlation value per window(i)
             r_L = np.append(r_L, r_l)
             r_R = np.append(r_R, r_r)
 
-            ###### Estimate accuracy #####
+            ######  Estimate accuracy  #####
+            if r_l > r_r:
+                acc = 1
+            else:
+                acc = 0
+
+            print("======= acc : {0} ".format(acc))
+
+            # Save acc for entire Accuracy
+            Acc = np.append(Acc, acc)
+
+            #===========================================================================
+
+
+            # Sum w - window
+            if i == 0:
+                model_w = model
+                inter_w = inter
+            else:  # i > 0 - 45까지
+                model_w = np.add(model_w, model)
+                inter_w = np.add(inter_w, inter)
+
+            i = i + 1
+
+        # ------------------------------- Test set -------------------------------#
+        else:
+            state = "Test set"
+
+            ## Calculate Predicted signal ##
+            pred_l, r_l, p, mse = mtrf_predict(stim_L[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
+                                             Dir, tmin, tmax, inter)
+            pred_r, r_r, p, mse = mtrf_predict(stim_R[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
+                                             Dir, tmin, tmax, inter)
+
+            predic_l.append(pred_l)
+            predic_r.append(pred_r)
+
+            print("Test")
+            # Stock correlation value per window(i)
+            r_L = np.append(r_L, r_l)
+            r_R = np.append(r_R, r_r)
+
+            ######  Estimate accuracy  #####
             if r_l > r_r:
                 acc = 1
             else:
@@ -322,18 +225,120 @@ for ch in range(0,16):
             # Up window number
             i = i + 1
 
+        # -- End one windo --w
+
+    # ------------------------ End 60s - one trial ------------------------#
+
+    ###### The things that have to calculate per trial ######
+    ## Add model_w case train
+    if state == "Train set":
+        if tr == 0:
+            model_wt = model_w
+            inter_wt = inter_w
+        elif tr > 0:
+            model_wt = np.add(model_wt, model_w)
+            inter_wt = np.add(inter_wt, inter_w)
+
+        # Average at last train trial
+        if tr == 13:
+            model_wm = model_wt / (46 * 14)
+            inter_wm = inter_wt / (46 * 14)
+            model = model_wm
+            inter = inter_wm
+
+        #=============================================================
+
+        print("Train_check_trial")  # 당연히 높게 나와야함
         ACC = np.append(ACC, np.mean(Acc))
         Pre_L.append(predic_l)
         Pre_R.append(predic_r)
         print("\n==================================\n")
         print("Present Accuracy = {0}%".format(ACC[-1] * 100))
+        print("Present Channel = {0}".format(ch))
         print("\n==================================\n")
 
+        #=============================================================
+    elif state == "Test set":
+        # Stack correlation value collected during one trial
+        entr_L.append(r_L)
+        entr_R.append(r_R)
 
-        tr = tr + 1
+        r_L = []
+        r_R = []
 
-    Accuracy.append(ACC)
-    ACC = []
+        # Collect Accuracy per trial
+        ACC = np.append(ACC, np.mean(Acc))
+        Pre_L.append(predic_l)
+        Pre_R.append(predic_r)
+        print("\n==================================\n")
+        print("Present Accuracy = {0}%".format(ACC[-1] * 100))
+        print("Present Channel = {0}".format(ch))
+        print("\n==================================\n")
+
+    print(tr)
+    tr = tr + 1
+    w = 1
+
+
+# ----------------------------- 30 trial End -----------------------------#
+######################################################################################
+for tr in range(0,train):
+    Acc = []
+    speech = onset[tr] + (srate * 3) + 1
+
+    #raw = eeg[:60, :, tr]
+
+    for i in range(0,46):
+
+        win = raw[:, speech + srate * (i): speech + srate * (15 + i)]
+        win = Preproccessing(win, srate, 0.5, 8, 601)
+
+        # Select channel
+        win = win[[0,1,2,3,4,5,8,9,10,11,12,13,14,15],:]  #exclude o12, fp1
+
+        ## Calculate Predicted signal ##
+        pred_l, r_l, p, mse = mtrf_predict(stim_L[tr:tr + 1, 64 * (i): 64 * (15 + i)].T, win.T, model, fs,
+                                         Dir, tmin, tmax, inter)
+        pred_r, r_r, p, mse = mtrf_predict(stim_R[tr:tr + 1, 64 * (i): 64 * (15 + i)].T, win.T, model, fs,
+                                         Dir, tmin, tmax, inter)
+
+        predic_l.append(pred_l)
+        predic_r.append(pred_r)
+
+        print("Train check")
+        # Stock correlation value per window(i)
+        r_L = np.append(r_L, r_l)
+        r_R = np.append(r_R, r_r)
+
+        ###### Estimate accuracy #####
+        if r_l > r_r:
+            acc = 1
+        else:
+            acc = 0
+
+        print("======= acc : {0} ".format(acc))
+
+        # Save acc for entire Accuracy
+        Acc = np.append(Acc, acc)
+
+        # Up window number
+        i = i + 1
+
+    ACC = np.append(ACC, np.mean(Acc))
+    Pre_L.append(predic_l)
+    Pre_R.append(predic_r)
+    print("\n==================================\n")
+    print("Present Accuracy = {0}%".format(ACC[-1] * 100))
+    print("Present Channel = {0}".format(ch))
+    print("\n==================================\n")
+
+
+    tr = tr + 1
+
+print("Total Accuracy = {0}%".format(mean(ACC[14:29])*100))
+Accuracy.append(ACC)
+#ACC = []
+#tr = 0
 
 
 print("The End")

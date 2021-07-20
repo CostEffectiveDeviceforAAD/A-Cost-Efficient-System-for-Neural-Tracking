@@ -75,15 +75,15 @@ train_mean_ori = mean(Acc(31:end));
 
 %%
 clear
-
 load 'Accuracy.mat' 
-test_Acc(1) = mean(Acc{1}(15:30));
-train_Acc(1) = mean(Acc{1}(31:end));
-for i = 2:16
-    test_Acc(i) = mean(Acc{i}(1:16));
-    train_Acc(i) = mean(Acc{i}(17:end));
+
+for i = 1:size(Acc,1)
+    check_Acc(i) = mean(Acc(i,1:14))*100;
+    test_Acc(i)  = mean(Acc(i,15:30))*100;
+    train_Acc(i) = mean(Acc(i,31:end))*100;
 end
 
+%max = max(test_Acc);
 %% Envelope
 load 'Predict_L.mat'
 load 'Allspeech.mat'

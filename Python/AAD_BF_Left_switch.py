@@ -26,7 +26,7 @@ from Brainflow_stream import *
 # -------------------------------- SETTING ---------------------------------#
 
 #########
-subject = ''
+subject = '0721_BSC'
 ###########
 
 #loc = 'kist'
@@ -108,7 +108,7 @@ tr = 0  # trial
 
 # ----------------------------- Make the window for Psychopy -----------------------------#
 
-screen = visual.Window([960, 900], screen=1, pos=[600, 0], fullscr=True,
+screen = visual.Window([960, 900], screen=0, pos=[600, 0], fullscr=True,
                        winType='pyglet', allowGUI=False, allowStencil=False,
                        monitor='testMonitor', color=[-1, -1, -1], blendMode='avg',
                        units='pix')
@@ -258,8 +258,7 @@ while tr < 30:  # 30
 
                 # ----------------------------- Pre-processing -----------------------------#
                 # preprocessing_ha.py
-                ## order 조정필요.
-                win = Preproccessing(win, srate, 0.5, 8, 375)  # data, sampling rate, low-cut, high-cut, filter order
+                win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
                 data_l = len(win.T)
 
                 # ------------------------------- Train set -------------------------------#
@@ -323,19 +322,6 @@ while tr < 30:  # 30
                 print("working time = {0}s".format(work))
 
         # ------------------------ End 60s - one trial ------------------------#
-        ##### Question #####
-        try:
-            print("Question Time")
-
-            correct, answer = Question(j, path, screen)
-
-            Correct.append(correct)
-            Answer.append(answer)
-            # Correct.append(correct)
-            Answer.append(answer)
-            j = j + 1
-        except KeyError:  # 마지막 질문 후 에러나서
-            pass
 
         # Stack eeg_record per trial & Save
         EEG.append(eeg_record.T)
@@ -376,6 +362,22 @@ while tr < 30:  # 30
             print("Present Accuracy = {0}%".format(ACC[-1] * 100))
             print("\n==================================\n")
 
+
+        ##### Question #####
+        try:
+            print("Question Time")
+
+            correct, answer = Question(j, path, screen)
+
+            Correct.append(correct)
+            Answer.append(answer)
+            # Correct.append(correct)
+            Answer.append(answer)
+            j = j + 1
+        except KeyError:  # 마지막 질문 후 에러나서
+            pass
+
+
         # Save per trial // eeg, trigger, accuracy ,behavior
         EEG_all = np.asarray(EEG)
         AUX_all = np.asarray(AUX)
@@ -394,12 +396,23 @@ while tr < 30:  # 30
         Comments(tr, path, screen)
 
 # ----------------------------- 30 trial End -----------------------------#
+# final data
+input = board.get_board_data()
+raw_data = np.concatenate((raw_data, -eeg_data), axis=1)
+tri_data = np.concatenate((tri_data, aux_data), axis=1)
+scipy.io.savemat(path + '/save_data/RAW' + subject + '.mat', {'RAW': raw_data})
+scipy.io.savemat(path + '/save_data/TRIGGER' + subject + '.mat', {'TRIGGER': tri_data})
 
+# Represent Total accuracy
+print("Total Accuracy = {0}%".format(mean(ACC)*100))
+
+# END
 print("The End")
 final = visual.TextStim(screen, text="실험이 끝났습니다. \n\n 수고하셨습니다.", height=50, color=[1, 1, 1], wrapWidth=2000)
 final.draw()
 screen.flip()
 time.sleep(3)
+
 
 port.close()
 screen.close()
@@ -414,6 +427,9 @@ scipy.io.savemat(path + '/save_data/Answer' + subject + '.mat', {'Answer': answe
 # np save
 np.save(path + '/save_data/EEG' + subject, EEG_all)
 np.save(path + '/save_data/A' + subject, AUX_all)
+np.save(path + '/save_data/RAW' + subject, raw_data)
+np.save(path + '/save_data/EEG' + subject, tri_data)
+
 np.save(path + '/save_data/All_Accuracy' + subject, ACC)
 entr_L = np.asarray(entr_L)
 entr_R = np.asarray(entr_R)
