@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 import pandas as pd
 from pylsl import StreamInlet, resolve_stream, StreamInfo
-# from OpenBCI_lsl import *
+# from OpenBCI_lsl import *5
 from scipy import signal
 from scipy.signal import butter, lfilter, resample, filtfilt
 # from helper import *
@@ -29,8 +29,8 @@ from Brainflow_stream import *
 subject = '0721_BSC'
 ###########
 
-#loc = 'kist'
-loc = 'hyu'
+loc = 'kist'
+#loc = 'hyu'
 
 if loc == 'kist':
     arduino = "COM8"
@@ -108,7 +108,7 @@ tr = 0  # trial
 
 # ----------------------------- Make the window for Psychopy -----------------------------#
 
-screen = visual.Window([960, 900], screen=0, pos=[600, 0], fullscr=True,
+screen = visual.Window([960, 900], screen=1, pos=[600, 0], fullscr=True,
                        winType='pyglet', allowGUI=False, allowStencil=False,
                        monitor='testMonitor', color=[-1, -1, -1], blendMode='avg',
                        units='pix')
@@ -381,13 +381,13 @@ while tr < 30:  # 30
         # Save per trial // eeg, trigger, accuracy ,behavior
         EEG_all = np.asarray(EEG)
         AUX_all = np.asarray(AUX)
-        scipy.io.savemat(path + '/save_data/E' + subject + '.mat', {'EEG': EEG_all})
-        scipy.io.savemat(path + '/save_data/A' + subject + '.mat', {'AUX': AUX_all})
-        scipy.io.savemat(path + '/save_data/RAW' + subject + '.mat', {'RAW': raw_data})
-        scipy.io.savemat(path + '/save_data/TRIGGER' + subject + '.mat', {'TRIGGER': tri_data})
-        scipy.io.savemat(path + '/save_data/Accuracy' + subject + '.mat', {'Acc': ACC})
+        scipy.io.savemat(path + '/save_data/E_' + subject + '.mat', {'EEG': EEG_all})
+        scipy.io.savemat(path + '/save_data/A_' + subject + '.mat', {'AUX': AUX_all})
+        scipy.io.savemat(path + '/save_data/RAW_' + subject + '.mat', {'RAW': raw_data})
+        scipy.io.savemat(path + '/save_data/TRIGGER_' + subject + '.mat', {'TRIGGER': tri_data})
+        scipy.io.savemat(path + '/save_data/Accuracy_' + subject + '.mat', {'Acc': ACC})
         correct_all = np.asarray(Correct)
-        scipy.io.savemat(path + '/save_data/Behavior' + subject + '.mat', {'Behavior': correct_all})
+        scipy.io.savemat(path + '/save_data/Behavior_' + subject + '.mat', {'Behavior': correct_all})
 
         tr = tr + 1
         w = 1
@@ -400,11 +400,13 @@ while tr < 30:  # 30
 input = board.get_board_data()
 raw_data = np.concatenate((raw_data, -eeg_data), axis=1)
 tri_data = np.concatenate((tri_data, aux_data), axis=1)
-scipy.io.savemat(path + '/save_data/RAW' + subject + '.mat', {'RAW': raw_data})
-scipy.io.savemat(path + '/save_data/TRIGGER' + subject + '.mat', {'TRIGGER': tri_data})
+scipy.io.savemat(path + '/save_data/RAW_' + subject + '.mat', {'RAW': raw_data})
+scipy.io.savemat(path + '/save_data/TRIGGER_' + subject + '.mat', {'TRIGGER': tri_data})
 
 # Represent Total accuracy
-print("Total Accuracy = {0}%".format(mean(ACC)*100))
+print("\n===================================\n")
+print("=== Total Accuracy = {0}% ===".format(mean(ACC)*100))
+print("\n===================================\n")
 
 # END
 print("The End")
@@ -422,16 +424,16 @@ board.release_session()
 #### save ####
 # mat save
 answer_all = np.asarray(Answer)
-scipy.io.savemat(path + '/save_data/Answer' + subject + '.mat', {'Answer': answer_all})
+scipy.io.savemat(path + '/save_data/Answer_' + subject + '.mat', {'Answer': answer_all})
 
 # np save
-np.save(path + '/save_data/EEG' + subject, EEG_all)
-np.save(path + '/save_data/A' + subject, AUX_all)
-np.save(path + '/save_data/RAW' + subject, raw_data)
-np.save(path + '/save_data/EEG' + subject, tri_data)
+np.save(path + '/save_data/EEG_' + subject, EEG_all)
+np.save(path + '/save_data/A_' + subject, AUX_all)
+np.save(path + '/save_data/RAW_' + subject, raw_data)
+np.save(path + '/save_data/EEG_' + subject, tri_data)
 
-np.save(path + '/save_data/All_Accuracy' + subject, ACC)
+np.save(path + '/save_data/All_Accuracy_' + subject, ACC)
 entr_L = np.asarray(entr_L)
 entr_R = np.asarray(entr_R)
-np.save(path + '/save_data/All_correlation_right' + subject, entr_R)
-np.save(path + '/save_data/All_correlation_left' + subject, entr_L)
+np.save(path + '/save_data/All_correlation_righ_' + subject, entr_R)
+np.save(path + '/save_data/All_correlation_left_' + subject, entr_L)

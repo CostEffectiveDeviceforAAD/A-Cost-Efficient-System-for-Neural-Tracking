@@ -47,8 +47,8 @@ def Preproccessing(win,srate, low, high, order):
 
     ## Z-scoring
 
-    #win = (win - win.mean()) / win.std()
-    win = stats.zscore(win)
+    win = (win - win.mean()) / win.std()
+    #win = stats.zscore(win)
 
     return win
 
