@@ -66,7 +66,7 @@ fs = 64
 tmin = 0
 tmax = 250
 Dir = -1
-reg_lambda = 10
+reg_lambda = [x for x in range(2^0,2^10,2)]
 train = 14
 ##############################################
 # Set int
@@ -80,7 +80,8 @@ inter_w = []
 entr_L = []
 entr_R = []
 Accuracy = []
-
+eeg = []
+model = []
 # for trial array / for entire array
 
 onset = []
@@ -110,7 +111,20 @@ for i in range(0, len(ind) - 1):
     if ind[i + 1] - ind[i] != 1:
         onset.append(ind[i])
 onset.append(ind[len(ind) - 1])
+stim = []
+for tr in range(0,30):
 
+    speech = onset[tr] + (srate * 3) + 1
+    eeg.append(raw[:,speech:speech+srate*60].T)
+
+eeg2 = np.asarray(eeg)
+stim.append((stim_L).T)
+stim = np.asarray(stim)
+stim = stim.T
+
+eeg2 = Preproccessing(eeg2, srate, 0.5, 8, 601)
+
+r, p, mse, pred, model = mtrf_crossval(stim_L.T, eeg2, fs, Dir, tmin, tmax, reg_lambda)
 
 while tr < 30:  # 30
 
@@ -145,17 +159,9 @@ while tr < 30:  # 30
             state = "Train set"
 
             ## mTRF train function ##
-            model, tlag, inter = mtrf_train(stim_L[tr:tr + 1, 64 * (i) : 64 * (15 + i)].T, win.T, fs, Dir,
-                                            tmin, tmax, reg_lambda)
+            r, p, mse, pred, model = mtrf_crossval(stim_L[tr:tr + 1, 64 * (i): 64 * (15 + i)].T, win.T, fs, Dir, tmin, tmax, reg_lambda)
 
             'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'
-
-            #================================================================
-
-            pred_l, r_l, p, mse = mtrf_predict(stim_L[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
-                                             Dir, tmin, tmax, inter)
-            pred_r, r_r, p, mse = mtrf_predict(stim_R[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
-                                             Dir, tmin, tmax, inter)
 
             predic_l.append(pred_l)
             predic_r.append(pred_r)

@@ -26,7 +26,7 @@ from Brainflow_stream import *
 # -------------------------------- SETTING ---------------------------------#
 
 #########
-subject = '0721_BSC'
+subject = ''
 ###########
 
 loc = 'kist'

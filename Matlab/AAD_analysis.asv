@@ -133,19 +133,18 @@ for i = 0
 end
 
 %% 비교
-tr = 24
-pre_l = squeeze(Pre_L(tr,:,:));
 
+Pre_L
 
-for i = 16:20
+for i = 0:5
     figure()
     subplot(211)
     plot(x, Allspeech(31+i, 64*(i)+1:64*(15+i))'); hold on
-    plot(x, pre_l(i+1,:)*5')
+    plot(x, pre(i+1,:)*5')
     title('Speech-att')
     subplot(212)
     plot(x, Allspeech(1+i, 64*(i)+1:64*(15+i))'); hold on
-    plot(x, pre_l(i+1,:)*5')
+    plot(x, pre(i+1,:)*5')
     title('Speech-unatt')
 end
 
