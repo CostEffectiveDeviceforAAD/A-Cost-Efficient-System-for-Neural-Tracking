@@ -1,5 +1,5 @@
 """"""""""""""""""""""""""""""""""""""""""
-#        OpenBCI - Brainflow           #
+#        OpenBCI - Brainflow            #
 #           For Online AAD              #
 """"""""""""""""""""""""""""""""""""""""""
 
@@ -26,7 +26,7 @@ from Brainflow_stream import *
 # -------------------------------- SETTING ---------------------------------#
 
 #########
-subject = '0721_BSC'
+subject = '0726_KKM'
 ###########
 
 loc = 'kist'
@@ -166,8 +166,12 @@ for p in range(0, 2):
 # ==================================================================================================#
 
 Comments(tr, path, screen)
+
 # ---------- Start 30 trial ----------#
+
+# Throw data which dont need
 input = board.get_board_data()
+
 while tr < 30:  # 30
 
     # ----------------------------- Psychopy Window & Serial Write ------------------------------#
@@ -176,7 +180,7 @@ while tr < 30:  # 30
         port.write(b'1')
         w = 0
 
-    # Trigger detection
+    # Data acquisition
     input = board.get_board_data()
     eeg_data = input[eeg_channels, :]
     aux_data = input[aux_channels, :]
@@ -202,6 +206,7 @@ while tr < 30:  # 30
         i = 0  # Window number
         work = 0  # Time count
         check = -3
+        Acc = []
 
         # ----------------------------- Working while 60s -----------------------------#
 
@@ -226,6 +231,7 @@ while tr < 30:  # 30
 
             ### Receive sample ###
             input = board.get_board_data()
+
             # Separate EEG, AUX
             eeg_data = input[eeg_channels, :]
             aux_data = input[aux_channels, :]  # 11,12,13 / 0 or 1
@@ -246,8 +252,7 @@ while tr < 30:  # 30
             if check >= 15:
 
                 # Adjust data as acquired from that time.
-                win = eeg_record[:, speech + srate * (i):]
-                trg = aux_record[:, speech + srate * (i):]
+                win = eeg_record[:, speech + srate * (i):]      # channel by time
 
                 if len(win.T) > srate * (15):
                     win = eeg_record[:, speech + srate * (i): speech + srate * (15 + i)]
@@ -258,8 +263,12 @@ while tr < 30:  # 30
 
                 # ----------------------------- Pre-processing -----------------------------#
                 # preprocessing_ha.py
+                # Delete No.8 channel (not use)
+                win = np.delete(win, 7, axis=0)     # delete 7 row ( 8 channel )
+
                 win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
-                data_l = len(win.T)
+
+                data_l = len(win.T)     # To check the length of inputted data
 
                 # ------------------------------- Train set -------------------------------#
                 if tr < train:  # int train
@@ -310,7 +319,7 @@ while tr < 30:  # 30
                     # Up window number
                     i = i + 1
 
-                # -- End one windo --w
+                # -- End one window --#
 
                 # In trial 27~30, switch direction
                 if tr + 1 >= 27 and check > 25:
@@ -322,13 +331,6 @@ while tr < 30:  # 30
                 print("working time = {0}s".format(work))
 
         # ------------------------ End 60s - one trial ------------------------#
-
-        # Stack eeg_record per trial & Save
-        EEG.append(eeg_record.T)
-        AUX.append(aux_record.T)
-        # For Next trial
-        eeg_record = np.zeros((16, 1))
-        aux_record = np.zeros((3, 1))
 
         ###### The things that have to calculate per trial ######
         ## Add model_w case train
@@ -354,7 +356,6 @@ while tr < 30:  # 30
 
             r_L = []
             r_R = []
-            plt.close()
 
             # Collect Accuracy per trial
             ACC = np.append(ACC, np.mean(Acc))
@@ -363,7 +364,7 @@ while tr < 30:  # 30
             print("\n==================================\n")
 
 
-        ##### Question #####
+        #####----- Question -----#####
         try:
             print("Question Time")
 
@@ -377,7 +378,27 @@ while tr < 30:  # 30
         except KeyError:  # 마지막 질문 후 에러나서
             pass
 
+        #=======  Data acquisition for rest  =======#
+        input = board.get_board_data()
 
+        # Separate EEG, AUX
+        eeg_data = input[eeg_channels, :]
+        aux_data = input[aux_channels, :]  # 11,12,13 / 0 or 1
+
+        # Stack data
+        eeg_record = np.concatenate((eeg_record, -eeg_data), axis=1)  # channel by time
+        aux_record = np.concatenate((aux_record, aux_data), axis=1)
+        raw_data = np.concatenate((raw_data, -eeg_data), axis=1)
+        tri_data = np.concatenate((tri_data, aux_data), axis=1)
+
+        #===== Stack eeg_record per trial & Save =====#
+        EEG.append(eeg_record.T)
+        AUX.append(aux_record.T)
+        # For Next trial
+        eeg_record = np.zeros((16, 1))
+        aux_record = np.zeros((3, 1))
+
+        #--------------------------------------------------------------------------------#
         # Save per trial // eeg, trigger, accuracy ,behavior
         EEG_all = np.asarray(EEG)
         AUX_all = np.asarray(AUX)
@@ -396,12 +417,6 @@ while tr < 30:  # 30
         Comments(tr, path, screen)
 
 # ----------------------------- 30 trial End -----------------------------#
-# final data
-input = board.get_board_data()
-raw_data = np.concatenate((raw_data, -eeg_data), axis=1)
-tri_data = np.concatenate((tri_data, aux_data), axis=1)
-scipy.io.savemat(path + '/save_data/RAW_' + subject + '.mat', {'RAW': raw_data})
-scipy.io.savemat(path + '/save_data/TRIGGER_' + subject + '.mat', {'TRIGGER': tri_data})
 
 # Represent Total accuracy
 print("\n===================================\n")
@@ -414,7 +429,6 @@ final = visual.TextStim(screen, text="실험이 끝났습니다. \n\n 수고하�
 final.draw()
 screen.flip()
 time.sleep(3)
-
 
 port.close()
 screen.close()
@@ -431,7 +445,6 @@ np.save(path + '/save_data/EEG_' + subject, EEG_all)
 np.save(path + '/save_data/A_' + subject, AUX_all)
 np.save(path + '/save_data/RAW_' + subject, raw_data)
 np.save(path + '/save_data/EEG_' + subject, tri_data)
-
 np.save(path + '/save_data/All_Accuracy_' + subject, ACC)
 entr_L = np.asarray(entr_L)
 entr_R = np.asarray(entr_R)
