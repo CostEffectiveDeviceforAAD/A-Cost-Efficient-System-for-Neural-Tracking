@@ -27,8 +27,8 @@ from Direction import *
 subject = ''
 ###########
 
-#loc = 'kist'
-loc = 'hyu'
+loc = 'kist'
+#loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -66,7 +66,7 @@ fs = 64
 tmin = 0
 tmax = 250
 Dir = -1
-reg_lambda = 10
+reg_lambda = 100
 train = 14
 ##############################################
 # Set int
@@ -140,6 +140,12 @@ while tr < 30:  # 30
 
         win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
 
+<<<<<<< HEAD
+=======
+        # Select channel
+        #win = win[[0,1,2,3,4,5,8,9,10,11,12,13,14,15],:]
+
+>>>>>>> hajiy
         # ------------------------------- Train set -------------------------------#
         if tr < train:  # int train
             state = "Train set"
@@ -277,6 +283,7 @@ while tr < 30:  # 30
 
 
 # ----------------------------- 30 trial End -----------------------------#
+<<<<<<< HEAD
 '''
 ######################################################################################
 for tr in range(0,train):
@@ -327,6 +334,10 @@ for tr in range(0,train):
 
     tr = tr + 1
 '''
+=======
+
+
+>>>>>>> hajiy
 print("Total Accuracy = {0}%".format(mean(ACC[14:30])*100))
 Accuracy.append(ACC)
 #ACC = []
