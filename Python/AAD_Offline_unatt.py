@@ -1,6 +1,6 @@
 """"""""""""""""""""""""""""""""""""""""""
 #        OpenBCI - Brainflow           #
-#           For Online AAD              #
+#           For Offline AAD              #
 """"""""""""""""""""""""""""""""""""""""""
 
 ###### Imports #####
@@ -27,8 +27,8 @@ from Direction import *
 subject = ''
 ###########
 
-loc = 'kist'
-#loc = 'hyu'
+#loc = 'kist'
+loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -47,10 +47,10 @@ stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
 # Load data
 
-raw_mat = io.loadmat(path + '/Recording data/0721_BSC/RAW_0721_BSC.mat')
+raw_mat = io.loadmat(path + '/Recording data/0714_LJW/RAW_01LJW.mat')
 raw = raw_mat['RAW']        # channel by time
 raw = np.concatenate((raw, np.ones([16,100])), axis=1)  # for final trial (lack of time)
-tri_mat = io.loadmat(path + '/Recording data/0721_BSC/TRIGGER_0721_BSC.mat')
+tri_mat = io.loadmat(path + '/Recording data/0714_LJW/TRIGGER_01LJW.mat')
 tri = tri_mat['TRIGGER']    # 3 by time
 
 ch = 2
@@ -66,7 +66,7 @@ fs = 64
 tmin = 0
 tmax = 250
 Dir = -1
-reg_lambda = 100
+reg_lambda = 10
 train = 14
 ##############################################
 # Set int
@@ -91,6 +91,7 @@ Pre_R = []
 w = 1  # To avoid repeat when detect trigger
 j = 0  # Question number
 tr = 0  # trial
+
 ##############################################
 
 
@@ -111,6 +112,7 @@ for i in range(0, len(ind) - 1):
         onset.append(ind[i])
 onset.append(ind[len(ind) - 1])
 
+#for ch in [5,11]:
 
 while tr < 30:  # 30
 
@@ -140,18 +142,15 @@ while tr < 30:  # 30
 
         win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
 
-<<<<<<< HEAD
         # Select channel
         #win = win[[0,1,2,3,4,5,8,9,10,11,12,13,14,15],:]
 
-=======
->>>>>>> hajiy
         # ------------------------------- Train set -------------------------------#
         if tr < train:  # int train
             state = "Train set"
 
             ## mTRF train function ##
-            model, tlag, inter = mtrf_train(stim_L[tr:tr + 1, 64 * (i) : 64 * (15 + i)].T, win.T, fs, Dir,
+            model, tlag, inter = mtrf_train(stim_R[tr:tr + 1, 64 * (i) : 64 * (15 + i)].T, win.T, fs, Dir,
                                             tmin, tmax, reg_lambda)
 
             'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'
@@ -172,7 +171,7 @@ while tr < 30:  # 30
             r_R = np.append(r_R, r_r)
 
             ######  Estimate accuracy  #####
-            if r_l > r_r:
+            if r_r > r_l:
                 acc = 1
             else:
                 acc = 0
@@ -214,7 +213,7 @@ while tr < 30:  # 30
             r_R = np.append(r_R, r_r)
 
             ######  Estimate accuracy  #####
-            if r_l > r_r:
+            if r_r > r_l:
                 acc = 1
             else:
                 acc = 0
@@ -283,20 +282,20 @@ while tr < 30:  # 30
 
 
 # ----------------------------- 30 trial End -----------------------------#
-<<<<<<< HEAD
-
-
-=======
-'''
 ######################################################################################
 for tr in range(0,train):
     Acc = []
     speech = onset[tr] + (srate * 3) + 1
 
+    #raw = eeg[:60, :, tr]
+
     for i in range(0,46):
 
         win = raw[:, speech + srate * (i): speech + srate * (15 + i)]
         win = Preproccessing(win, srate, 0.5, 8, 601)
+
+        # Select channel
+        #win = win[[0,1,2,3,4,5,8,9,10,11,12,13,14,15],:]  #exclude o12, fp1
 
         ## Calculate Predicted signal ##
         pred_l, r_l, p, mse = mtrf_predict(stim_L[tr:tr + 1, 64 * (i): 64 * (15 + i)].T, win.T, model, fs,
@@ -313,7 +312,7 @@ for tr in range(0,train):
         r_R = np.append(r_R, r_r)
 
         ###### Estimate accuracy #####
-        if r_l > r_r:
+        if r_r > r_l:
             acc = 1
         else:
             acc = 0
@@ -336,9 +335,8 @@ for tr in range(0,train):
 
 
     tr = tr + 1
-'''
->>>>>>> hajiy
-print("Total Accuracy = {0}%".format(mean(ACC[14:30])*100))
+
+print("Total Accuracy = {0}%".format(mean(ACC[14:29])*100))
 Accuracy.append(ACC)
 #ACC = []
 #tr = 0
