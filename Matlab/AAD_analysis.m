@@ -1,7 +1,8 @@
 %% Real-time AAD analysis
+clear
 
 sub = '_01LJW'
-subject = 1
+subject = 3
 
 %% Behavior
 file = strcat('Behavior',sub, '.mat');
@@ -20,7 +21,7 @@ accb = (length(correct)/60)*100;
 file = strcat('Accuracy',sub, '.mat');
 load(file)  % Acc
 
-C = readtable('result_sample.xlsx');
+C = readtable('C:\Users\LeeJiWon\Desktop\OpenBCI\Recording data\result.xlsx');
 
 overall = mean(Acc*100);
 fixed = mean(Acc(1:12)*100);
@@ -30,11 +31,11 @@ data = [C; table(subject,overall, fixed, switching)]
 
 chance = 52.99
 
-%%
-writetable(data, 'result_sample.xlsx');
+%% Write to Excel file 
+writetable(data, 'C:\Users\LeeJiWon\Desktop\OpenBCI\Recording data\result.xlsx');
 
 %% 1 subject
-C = readtable('result_sample.xlsx');
+%C = readtable('result_sample.xlsx');
 
 X = categorical({'Overall','Fixed','Switching'});
 Y = table2array(C(subject, 2:end));
@@ -75,7 +76,7 @@ train_mean_ori = mean(Acc(31:end));
 
 %% channel search
 clear
-load 'Accuracy.mat' 
+load 'Accuracy_chloc.mat' 
 
 for i = 1:size(Acc,1)
     check_Acc(i) = mean(Acc(i,1:14))*100;
@@ -166,3 +167,22 @@ for (i = 16:20)
     legend('speech', 'predicted')
 end
 %16,17,18,24,25,
+
+%% bar and spot
+
+X = reordercats(X,{'Overall','Fixed','Switching'});
+
+for sub = 1: length(data.subject)
+    Y = [Y; table2array(C(sub,2:end))];
+end
+
+Ym = mean(Y, 1)
+
+b = bar(X, Ym);  hold on
+plot(X, Y', '-o');
+grid on
+ylim([0 80])
+ylabel('Accuracy(%)')
+% refline([0, chance]);
+title('Total')
+

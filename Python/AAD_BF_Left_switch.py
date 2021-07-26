@@ -26,11 +26,11 @@ from Brainflow_stream import *
 # -------------------------------- SETTING ---------------------------------#
 
 #########
-<<<<<<< HEAD
+
 subject = '0726_KKM'
 =======
 subject = ''
->>>>>>> hajiy
+
 ###########
 
 loc = 'kist'

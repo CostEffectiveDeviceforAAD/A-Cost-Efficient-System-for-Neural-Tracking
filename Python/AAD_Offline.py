@@ -138,14 +138,13 @@ while tr < 30:  # 30
         # ----------------------------- Pre-processing -----------------------------#
         # preprocessing_ha.py
 
+        win = np.delete(win, 7, axis=0)
         win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
 
-<<<<<<< HEAD
+
         # Select channel
         #win = win[[0,1,2,3,4,5,8,9,10,11,12,13,14,15],:]
 
-=======
->>>>>>> hajiy
         # ------------------------------- Train set -------------------------------#
         if tr < train:  # int train
             state = "Train set"

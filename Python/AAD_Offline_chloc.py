@@ -24,11 +24,11 @@ from Direction import *
 # -------------------------------- SETTING ---------------------------------#
 
 #########
-subject = ''
+subject = '_chloc'
 ###########
 
-#loc = 'kist'
-loc = 'hyu'
+loc = 'kist'
+#loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -47,10 +47,10 @@ stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
 # Load data
 
-raw_mat = io.loadmat(path + '/Recording data/0721_BSC/RAW_0721_BSC.mat')
+raw_mat = io.loadmat(path + '/Recording data/0726_KKM/RAW_0726_KKM.mat')
 raw = raw_mat['RAW']        # channel by time
 raw = np.concatenate((raw, np.ones([16,100])), axis=1)  # for final trial (lack of time)
-tri_mat = io.loadmat(path + '/Recording data/0721_BSC/TRIGGER_0721_BSC.mat')
+tri_mat = io.loadmat(path + '/Recording data/0726_KKM/TRIGGER_0726_KKM.mat')
 tri = tri_mat['TRIGGER']    # 3 by time
 
 ch = 2
@@ -111,7 +111,7 @@ for i in range(0, len(ind) - 1):
         onset.append(ind[i])
 onset.append(ind[len(ind) - 1])
 
-for ch in [9,13]:
+for ch in [4,5,6,9,11,12,14,15]:
 
     while tr < 30:  # 30
 
@@ -139,10 +139,10 @@ for ch in [9,13]:
             # ----------------------------- Pre-processing -----------------------------#
             # preprocessing_ha.py
 
-            win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
-
             # Select channel
-            win = win[[ch,0,1,2,3,4,5,6,7,8,10,11,12,14,15],:]
+            win = win[[ch,0,1,2,3,8,10,13],:]
+
+            win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
 
             # ------------------------------- Train set -------------------------------#
             if tr < train:  # int train
