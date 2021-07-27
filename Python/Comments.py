@@ -11,10 +11,17 @@ def practice(p, path, screen):
     print("practice")
     file = pd.read_excel(path + "/AAD/Python/prePractice.xlsx")
 
-    text = visual.TextStim(screen, text = "<<<", height=150, color=[1, 1, 1], wrapWidth=1500)
-    text.draw()
-    screen.flip()
-    time.sleep(15.3)
+    if p == 0:
+        text = visual.TextStim(screen, text = "<<<", height=150, color=[1, 1, 1], wrapWidth=1500)
+        text.draw()
+        screen.flip()
+        time.sleep(15.3)
+
+    if p == 1:
+        text = visual.TextStim(screen, text=">>>", height=150, color=[1, 1, 1], wrapWidth=1500)
+        text.draw()
+        screen.flip()
+        time.sleep(15.3)
 
     # Question 1
     text = visual.TextStim(screen, text = file.tweenty_Q1_practice[p], height=55, color=[1, 1, 1], wrapWidth=2000)

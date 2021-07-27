@@ -171,7 +171,7 @@ event.waitKeys(keyList=['space'], clearEvents=True)
 
 for p in range(0, 2):
     port.write(b'3')  # practice speech
-    practice(p, path, screen)
+    practice(p, path, screen,'L')
 
 # ==================================================================================================#
 # -------------------------------------- START EXPERIMENT ------------------------------------------#

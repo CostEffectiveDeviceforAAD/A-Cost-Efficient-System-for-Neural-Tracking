@@ -89,7 +89,8 @@ index = find(test_Acc==maxval);
 %% channel graph
 
 %ch = ['T7' 'Fz' 'T8' 'P4' 'P7' 'C3' 'O2'...
-%                'Fp1' 'O1' 'Pz' 'F3' 'Cz' 'C4' 'P3' 'P8' 'F4'];                   
+%                'Fp1' 'O1' 'Pz' 'F3' 'Cz' 'C4' 'P3' 'P8' 'F4'];        
+x = 1:14            
             
 %ac = [61.41, 65.76, 66.85, 67.39, 67.39, 66.17, 65.76...
 %        63.72, 62.77, 61.96, 60.60, 59.78, 58.42, 56.79, 54.89, 54.62];
@@ -99,19 +100,17 @@ index = find(test_Acc==maxval);
 
 ac = [62.36, 69.16, 69.57, 71.33, 73.10, 74.59, 76.36, 76.36, 76.77, 76.49, 76.77, 76.90, 75.54, 74.18, 71.60];     %kkm
 
-x = 1:15 
-
 % plot
 figure;
 plot(x, ac,'-or');
 set(gcf, 'color', 'white')
-set(gca, 'xtick', [1:15])
+set(gca, 'xtick', [1:14])
 %set(gca, 'xticklabel', char('T7', 'Fz', 'T8', 'P4', 'P7', 'C3', 'O2', 'Fp1'...
 %                                'O1', 'Pz', 'F3', 'Cz', 'C4', 'P3', 'P8', 'F4'))   %ljw
 %set(gca, 'xticklabel', char('Fp1', 'P7', 'T7', 'F4', 'Pz/P3', 'F7', 'P4',...
 %                                'O2', 'Fz', 'C4', 'C3/P8', 'F3', 'T8', 'Cz'))       % bsc
-set(gca, 'xticklabel', char('T8', 'Cz', 'Fz','F3', 'F7', 'C4', 'C3','P3', 'Pz',...
-                                'P7', 'P4', 'P8', 'F4', 'F8', 'T7'))       % kkm                                
+set(gca, 'xticklabel', char('T8', 'Cz', 'F3', 'F7', 'C4', 'P3', 'Pz',...
+                                'P7', 'P4', 'P8', 'F4', 'F8', 'T7', 'Cz'))       % kkm                                
                                 
 ylim([60 80])
 grid on 

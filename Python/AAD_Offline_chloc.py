@@ -27,8 +27,8 @@ from Direction import *
 subject = '_chloc'
 ###########
 
-loc = 'kist'
-#loc = 'hyu'
+#loc = 'kist'
+loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -111,7 +111,7 @@ for i in range(0, len(ind) - 1):
         onset.append(ind[i])
 onset.append(ind[len(ind) - 1])
 
-for ch in [4,5,6,9,11,12,14,15]:
+for ch in [12]:
 
     while tr < 30:  # 30
 
@@ -140,7 +140,7 @@ for ch in [4,5,6,9,11,12,14,15]:
             # preprocessing_ha.py
 
             # Select channel
-            win = win[[ch,0,1,2,3,8,10,13],:]
+            win = win[[ch,0,1,2,3,4,5,6,8,9,10,11,13,14,15],:]
 
             win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
 
