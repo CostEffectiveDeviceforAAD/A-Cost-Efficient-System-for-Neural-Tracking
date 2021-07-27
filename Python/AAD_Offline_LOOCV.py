@@ -24,11 +24,11 @@ from Direction import *
 # -------------------------------- SETTING ---------------------------------#
 
 #########
-subject = ''
+subject = '_loocv'
 ###########
 
-#loc = 'kist'
-loc = 'hyu'
+loc = 'kist'
+#loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -47,10 +47,10 @@ stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
 # Load data
 
-raw_mat = io.loadmat(path + '/Recording data/0721_BSC/RAW_0721_BSC.mat')
+raw_mat = io.loadmat(path + '/Recording data/0726_KKM/RAW_0726_KKM.mat')
 raw = raw_mat['RAW']        # channel by time
 raw = np.concatenate((raw, np.ones([16,100])), axis=1)  # for final trial (lack of time)
-tri_mat = io.loadmat(path + '/Recording data/0721_BSC/TRIGGER_0721_BSC.mat')
+tri_mat = io.loadmat(path + '/Recording data/0726_KKM/TRIGGER_0726_KKM.mat')
 tri = tri_mat['TRIGGER']    # 3 by time
 
 ch = 2
@@ -80,8 +80,8 @@ onset = []
 tr = 0
 train = 0
 
-model = np.zeros([16, 17, 1])
-inter = np.zeros([16, 1])
+model = np.zeros([15, 17, 1])
+inter = np.zeros([15, 1])
 
 ##############################################
 
@@ -104,17 +104,18 @@ onset.append(ind[len(ind) - 1])
 
 #for ch in [5,11]:
 
-while train < 26:  # 30
+while train < 30:  # 30
 
     # Format per trial
     Acc = []
-    model_w = np.zeros([16,17,1])
-    inter_w = np.zeros([16,1])
+    model_w = np.zeros([15,17,1])
+    inter_w = np.zeros([15,1])
     # ------------------------------- Train set -------------------------------#
-    for tr in range(0,26):
+    for tr in range(0,30):
 
         speech = onset[tr] + (srate * 3) + 1  # 3초 후 부터가 speech 이기에 +1
         win = raw[:, speech: speech + srate * 60]
+        win = np.delete(win, 7, axis=0)
         win = Preproccessing(win, srate, 0.5, 8, 601)
 
         if tr != train:
@@ -127,14 +128,15 @@ while train < 26:  # 30
         model_w = np.add(model_w, model)
         inter_w = np.add(inter_w, inter)
 
-    model = model_w / (25)
-    inter = inter_w / (25)
+    model = model_w / (29)
+    inter = inter_w / (29)
 
 
     #===========================================================================
     # ------------------------------- Test set -------------------------------#
     speech = onset[train] + (srate * 3) + 1  # 3초 후 부터가 speech 이기에 +1
     win = raw[:, speech: speech + srate * 60]
+    win = np.delete(win, 7, axis=0)
     win = Preproccessing(win, srate, 0.5, 8, 601)
 
     ## Calculate Predicted signal ##

@@ -27,9 +27,17 @@ from Brainflow_stream import *
 
 #########
 <<<<<<< HEAD
+<<<<<<< HEAD
 subject = ''
 =======
 subject = '0726_KKM'
+>>>>>>> hajiy
+=======
+
+subject = '0726_KKM'
+=======
+subject = ''
+
 >>>>>>> hajiy
 ###########
 
