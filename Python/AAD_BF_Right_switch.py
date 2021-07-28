@@ -27,6 +27,7 @@ from Brainflow_stream import *
 
 #########
 
+<<<<<<< Updated upstream
 subject = '0728_CTM'
 #subject = '0726_KKM'
 
@@ -48,6 +49,9 @@ elif loc == 'hyu':
 port = serial.Serial(arduino, 9600)
 
 # Connect Cyton with Brainflow network
+=======
+subject = '0728_LTM  network
+>>>>>>> Stashed changes
 board, args = Brainflow_stream(cyton)
 
 ##
