@@ -27,13 +27,13 @@ from Brainflow_stream import *
 
 #########
 
-subject = '0728_LTM'
+subject = '0728_CTM'
 #subject = '0726_KKM'
 
 ###########
 
-#loc = 'kist'
-loc = 'hyu'
+loc = 'kist'
+#loc = 'hyu'
 
 if loc == 'kist':
     arduino = "COM8"
@@ -111,7 +111,7 @@ tr = 0  # trial
 
 # ----------------------------- Make the window for Psychopy -----------------------------#
 
-screen = visual.Window([960, 900], screen=1, pos=[600, 0], fullscr=False,
+screen = visual.Window([960, 900], screen=1, pos=[600, 0], fullscr=True,
                        winType='pyglet', allowGUI=False, allowStencil=False,
                        monitor='testMonitor', color=[-1, -1, -1], blendMode='avg',
                        units='pix')

@@ -2,18 +2,42 @@
 clear
 
 sub = '_01LJW'
-subject = 3
+subject = 1
 
 %% Behavior
 file = strcat('Behavior',sub, '.mat');
 load(file)
 
-beh = Behavior(:,3:4);
+beh_at = Behavior(:,3:4);
+beh_un = Behavior(:,1:2);
 
-correct = find(beh=='T');
+correct_at = find(beh_at=='T');
+correct_un = find(beh_un=='T');
 
-accb = (length(correct)/60)*100;
-  
+accb_at = (length(correct_at)/60)*100;
+accb_un = (length(correct_un)/60)*100;  
+
+%% Bar plot - behavior
+
+X = categorical({'Attended','Unattended'});
+
+for sub = 1:size(C,1)
+    be_at(sub) = table2array(C(sub, 5));
+    be_un(sub) = table2array(C(sub, 6));
+end
+
+y = [be_at; be_un];
+Y = [mean(be_at), mean(be_un)];
+
+% plot
+
+b = bar(X, Y); hold on
+plot(X, y, '--ok');
+grid on
+ylim([0 100])
+ylabel('Accuracy(%)')
+set(gcf, 'color', 'white')
+title('Behavior Result')
 
 %% Accuracy Plot
 %% Accuracy
@@ -34,18 +58,24 @@ chance = 52.99
 %% Write to Excel file 
 writetable(data, 'C:\Users\LeeJiWon\Desktop\OpenBCI\Recording data\result.xlsx');
 
-%% 1 subject
+%% subject_total
 %C = readtable('result_sample.xlsx');
 
-X = categorical({'Overall','Fixed','Switching'});
-Y = table2array(C(subject, 2:end));
+X = reordercats(X,{'Overall','Fixed','Switching'});
 
-b = bar(X, Y);
+y = table2array(C(:, 2:4));
+Y = [mean(table2array(C(:,2))), mean(table2array(C(:,3))),...
+    mean(table2array(C(:,4)))];
+
+
+b = bar(X, Y);  hold on
+plot(X, y, '--ok');
 grid on
-ylim([0 80])
+set(gcf, 'color', 'white')
+ylim([50 80])
 ylabel('Accuracy(%)')
 % refline([0, chance]);
-title('Sub1')
+title('Total')
 
 %% multi subject
 
@@ -53,10 +83,10 @@ title('Sub1')
 Y = []
 X = []
 
-for sub = 1:length(data.subject)
+for sub = 1:length(C.subject)
     name = strcat('Sub', num2str(sub));
     X = [X, categorical({name})];
-    Y = [Y; table2array(C(sub,2:end))];
+    Y = [Y; table2array(C(sub,2:4))];
     
 end
 
@@ -64,8 +94,10 @@ b = bar(X, Y);
 grid on
 legend('overall','fixed','switching');
 ylim([0 80])
+set(gcf, 'color', 'white')
 ylabel('Accuracy(%)')
 xlabel('Subject')
+
 %%
 clear
 

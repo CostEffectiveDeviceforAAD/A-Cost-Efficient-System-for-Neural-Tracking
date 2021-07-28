@@ -2,18 +2,38 @@
 clear
 
 sub = '_01LJW'
-subject = 3
+subject = 1
 
 %% Behavior
 file = strcat('Behavior',sub, '.mat');
 load(file)
 
-beh = Behavior(:,3:4);
+beh_at = Behavior(:,3:4);
+beh_un = Behavior(:,1:2);
 
-correct = find(beh=='T');
+correct_at = find(beh_at=='T');
+correct_un = find(beh_un=='T');
 
-accb = (length(correct)/60)*100;
-  
+accb_at = (length(correct_at)/60)*100;
+accb_un = (length(correct_un)/60)*100;  
+
+%% Bar plot - behavior
+
+X = categorical({'Attended','Unattended'});
+
+for sub = 1:size(C,1)
+    be_at(sub) = table2array(C(sub, 5));
+    be_un(sub) = table2array(C(sub, 6));
+end
+
+Y = [mean(be_at), mean(be_un)];
+
+b = bar(X, Y);
+grid on
+ylim([0 100])
+ylabel('Accuracy(%)')
+% refline([0, chance]);
+title('Behavior Result')
 
 %% Accuracy Plot
 %% Accuracy
@@ -53,7 +73,7 @@ title('Sub1')
 Y = []
 X = []
 
-for sub = 1:length(data.subject)
+for sub = 1:length(C.subject)
     name = strcat('Sub', num2str(sub));
     X = [X, categorical({name})];
     Y = [Y; table2array(C(sub,2:end))];
@@ -64,8 +84,10 @@ b = bar(X, Y);
 grid on
 legend('overall','fixed','switching');
 ylim([0 80])
+set(gcf, 'color', 'white')
 ylabel('Accuracy(%)')
 xlabel('Subject')
+
 %%
 clear
 
@@ -89,8 +111,7 @@ index = find(test_Acc==maxval);
 %% channel graph
 
 %ch = ['T7' 'Fz' 'T8' 'P4' 'P7' 'C3' 'O2'...
-%                'Fp1' 'O1' 'Pz' 'F3' 'Cz' 'C4' 'P3' 'P8' 'F4'];        
-x = 1:14            
+%                'Fp1' 'O1' 'Pz' 'F3' 'Cz' 'C4' 'P3' 'P8' 'F4'];                   
             
 %ac = [61.41, 65.76, 66.85, 67.39, 67.39, 66.17, 65.76...
 %        63.72, 62.77, 61.96, 60.60, 59.78, 58.42, 56.79, 54.89, 54.62];
@@ -100,17 +121,19 @@ x = 1:14
 
 ac = [62.36, 69.16, 69.57, 71.33, 73.10, 74.59, 76.36, 76.36, 76.77, 76.49, 76.77, 76.90, 75.54, 74.18, 71.60];     %kkm
 
+x = 1:15 
+
 % plot
 figure;
 plot(x, ac,'-or');
 set(gcf, 'color', 'white')
-set(gca, 'xtick', [1:14])
+set(gca, 'xtick', [1:15])
 %set(gca, 'xticklabel', char('T7', 'Fz', 'T8', 'P4', 'P7', 'C3', 'O2', 'Fp1'...
 %                                'O1', 'Pz', 'F3', 'Cz', 'C4', 'P3', 'P8', 'F4'))   %ljw
 %set(gca, 'xticklabel', char('Fp1', 'P7', 'T7', 'F4', 'Pz/P3', 'F7', 'P4',...
 %                                'O2', 'Fz', 'C4', 'C3/P8', 'F3', 'T8', 'Cz'))       % bsc
-set(gca, 'xticklabel', char('T8', 'Cz', 'F3', 'F7', 'C4', 'P3', 'Pz',...
-                                'P7', 'P4', 'P8', 'F4', 'F8', 'T7', 'Cz'))       % kkm                                
+set(gca, 'xticklabel', char('T8', 'Cz', 'Fz','F3', 'F7', 'C4', 'C3','P3', 'Pz',...
+                                'P7', 'P4', 'P8', 'F4', 'F8', 'T7'))       % kkm                                
                                 
 ylim([60 80])
 grid on 

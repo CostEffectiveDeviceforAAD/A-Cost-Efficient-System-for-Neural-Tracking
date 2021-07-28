@@ -47,10 +47,10 @@ stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
 # Load data
 
-raw_mat = io.loadmat(path + '/Recording data/0721_BSC/RAW_0721_BSC.mat')
+raw_mat = io.loadmat(path + '/Recording data/0714_LJW/RAW_01LJW.mat')
 raw = raw_mat['RAW']        # channel by time
 raw = np.concatenate((raw, np.ones([16,100])), axis=1)  # for final trial (lack of time)
-tri_mat = io.loadmat(path + '/Recording data/0721_BSC/TRIGGER_0721_BSC.mat')
+tri_mat = io.loadmat(path + '/Recording data/0714_LJW/TRIGGER_01LJW.mat')
 tri = tri_mat['TRIGGER']    # 3 by time
 
 ch = 2
@@ -138,22 +138,16 @@ while tr < 30:  # 30
         # ----------------------------- Pre-processing -----------------------------#
         # preprocessing_ha.py
 
-        win = np.delete(win, 7, axis=0)
+        #win = np.delete(win, 7, axis=0)
         win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
         # Select channel
         #win = win[[0,1,2,3,4,5,8,9,10,11,12,13,14,15],:]
 
->>>>>>> hajiy
-=======
 
         # Select channel
         #win = win[[0,1,2,3,4,5,8,9,10,11,12,13,14,15],:]
 
->>>>>>> hajiy
         # ------------------------------- Train set -------------------------------#
         if tr < train:  # int train
             state = "Train set"
@@ -291,13 +285,7 @@ while tr < 30:  # 30
 
 
 # ----------------------------- 30 trial End -----------------------------#
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 
-
-=======
->>>>>>> hajiy
 '''
 ######################################################################################
 for tr in range(0,train):
@@ -348,13 +336,7 @@ for tr in range(0,train):
 
     tr = tr + 1
 '''
-<<<<<<< HEAD
-=======
 
-
-=======
->>>>>>> hajiy
->>>>>>> hajiy
 print("Total Accuracy = {0}%".format(mean(ACC[14:30])*100))
 Accuracy.append(ACC)
 #ACC = []
