@@ -27,8 +27,8 @@ from Direction import *
 subject = ''
 ###########
 
-loc = 'kist'
-#loc = 'hyu'
+#loc = 'kist'
+loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -47,10 +47,10 @@ stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
 # Load data
 
-raw_mat = io.loadmat(path + '/Recording data/0714_LJW/RAW_01LJW.mat')
+raw_mat = io.loadmat(path + '/Recording data/0726_KKM/RAW_0726_KKM.mat')
 raw = raw_mat['RAW']        # channel by time
 raw = np.concatenate((raw, np.ones([16,100])), axis=1)  # for final trial (lack of time)
-tri_mat = io.loadmat(path + '/Recording data/0714_LJW/TRIGGER_01LJW.mat')
+tri_mat = io.loadmat(path + '/Recording data/0726_KKM/TRIGGER_0726_KKM.mat')
 tri = tri_mat['TRIGGER']    # 3 by time
 
 ch = 2
@@ -66,7 +66,7 @@ fs = 64
 tmin = 0
 tmax = 250
 Dir = -1
-reg_lambda = 100
+reg_lambda = 10
 train = 14
 ##############################################
 # Set int
@@ -138,15 +138,8 @@ while tr < 30:  # 30
         # ----------------------------- Pre-processing -----------------------------#
         # preprocessing_ha.py
 
-        #win = np.delete(win, 7, axis=0)
+        win = np.delete(win, 7, axis=0)
         win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
-
-        # Select channel
-        #win = win[[0,1,2,3,4,5,8,9,10,11,12,13,14,15],:]
-
-
-        # Select channel
-        #win = win[[0,1,2,3,4,5,8,9,10,11,12,13,14,15],:]
 
         # ------------------------------- Train set -------------------------------#
         if tr < train:  # int train

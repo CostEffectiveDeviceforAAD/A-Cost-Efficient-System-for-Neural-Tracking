@@ -47,10 +47,10 @@ stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
 # Load data
 
-raw_mat = io.loadmat(path + '/Recording data/0726_KKM/RAW_0726_KKM.mat')
+raw_mat = io.loadmat(path + '/Recording data/0728_CTM/RAW_0728_CTM.mat')
 raw = raw_mat['RAW']        # channel by time
 raw = np.concatenate((raw, np.ones([16,100])), axis=1)  # for final trial (lack of time)
-tri_mat = io.loadmat(path + '/Recording data/0726_KKM/TRIGGER_0726_KKM.mat')
+tri_mat = io.loadmat(path + '/Recording data/0728_CTM/TRIGGER_0728_CTM.mat')
 tri = tri_mat['TRIGGER']    # 3 by time
 
 ch = 2
@@ -111,7 +111,7 @@ for i in range(0, len(ind) - 1):
         onset.append(ind[i])
 onset.append(ind[len(ind) - 1])
 
-for ch in [12]:
+for ch in [9]:
 
     while tr < 30:  # 30
 
@@ -140,9 +140,10 @@ for ch in [12]:
             # preprocessing_ha.py
 
             # Select channel
-            win = win[[ch,0,1,2,3,4,5,6,8,9,10,11,13,14,15],:]
+            win = win[[ch,0,1,2,3,4,5,6,8,10,11,12,13,14,15],:]
 
             win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
+            #win = win[[ch], :]
 
             # ------------------------------- Train set -------------------------------#
             if tr < train:  # int train

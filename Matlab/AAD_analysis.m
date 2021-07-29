@@ -45,7 +45,7 @@ title('Behavior Result')
 file = strcat('Accuracy',sub, '.mat');
 load(file)  % Acc
 
-C = readtable('C:\Users\LeeJiWon\Desktop\OpenBCI\Recording data\result.xlsx');
+C = readtable('C:\Users\user\Desktop\hy-kist\OpenBCI\AAD\Matlab\result.xlsx');
 
 overall = mean(Acc*100);
 fixed = mean(Acc(1:12)*100);
@@ -91,6 +91,8 @@ for sub = 1:length(C.subject)
 end
 
 b = bar(X, Y);
+yline(52.99, '-.k')
+hline.Color = 'r';
 grid on
 legend('overall','fixed','switching');
 ylim([0 80])
@@ -101,7 +103,7 @@ xlabel('Subject')
 %%
 clear
 
-load 'Accuracy.mat' 
+load 'Accuracy_chloc.mat' 
 train_trial_ori = mean(Acc(1:14));
 test_ori = mean(Acc(15:30));
 train_mean_ori = mean(Acc(31:end));
@@ -129,7 +131,11 @@ index = find(test_Acc==maxval);
 %ac = [71.47, 76.90, 76.22, 75.00, 72.83, 72.28, 70.38, 68.34, 67.39...
 %        68.75, 69.43, 70.38, 71.88, 69.57]  % bsc
 
-ac = [62.36, 69.16, 69.57, 71.33, 73.10, 74.59, 76.36, 76.36, 76.77, 76.49, 76.77, 76.90, 75.54, 74.18, 71.60];     %kkm
+%ac = [62.36, 69.16, 69.57, 71.33, 73.10, 74.59, 76.36, 76.36, 76.77, 76.49, 76.77, 76.90, 75.54, 74.18, 71.60];     %kkm
+
+ac = [68.75, 73.37, 74.05, 72.55, 75.68, 75.82, 76.36,...
+       76.22, 75.27, 74.86, 73.64, 72.69, 73.37, 72.01, 64.95]
+
 
 x = 1:15 
 
@@ -142,9 +148,11 @@ set(gca, 'xtick', [1:15])
 %                                'O1', 'Pz', 'F3', 'Cz', 'C4', 'P3', 'P8', 'F4'))   %ljw
 %set(gca, 'xticklabel', char('Fp1', 'P7', 'T7', 'F4', 'Pz/P3', 'F7', 'P4',...
 %                                'O2', 'Fz', 'C4', 'C3/P8', 'F3', 'T8', 'Cz'))       % bsc
-set(gca, 'xticklabel', char('T8', 'Cz', 'Fz','F3', 'F7', 'C4', 'C3','P3', 'Pz',...
-                                'P7', 'P4', 'P8', 'F4', 'F8', 'T7'))       % kkm                                
-                                
+%set(gca, 'xticklabel', char('T8', 'Cz', 'Fz','F3', 'F7', 'C4', 'C3','P3', 'Pz',...
+%                                'P7', 'P4', 'P8', 'F4', 'F8', 'T7'))       % kkm                                
+set(gca, 'xticklabel', char('P8', 'C3', 'F4','C4', 'Fz', 'P7','P3', 'T8', 'Cz', 'P4',...
+                                'Pz', 'T7', 'F7', 'F3', 'F8'))       % ctm  
+
 ylim([60 80])
 grid on 
 xlabel('Channel')
@@ -171,7 +179,7 @@ for i = 0
     title('Predicted')
 end
 
-%% 비교
+%% 비교-envelope
 tr = 24
 pre_l = squeeze(Pre_L(tr,:,:));
 
@@ -224,3 +232,21 @@ ylabel('Accuracy(%)')
 % refline([0, chance]);
 title('Total')
 
+%% bar and spot -ex
+Y=[]
+X = categorical({'Overall','Fixed','Switching'});
+X = reordercats(X,{'Overall','Fixed','Switching'});
+
+for sub = 1: size(C,1)
+    Y = [Y; table2array(C(sub,2:4))];
+end
+
+Ym = [mean(Y, 1); mean(Y, 1)+10];
+
+b = bar(X, Ym);  
+grid on
+ylim([0 80])
+ylabel('Accuracy(%)')
+set(gcf, 'color', 'white')
+legend('OpenBCI', 'Neuroscan');
+title('Comparison')
