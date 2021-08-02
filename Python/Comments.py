@@ -133,10 +133,15 @@ def Question(j, path, screen):
 
 
 
-def Comments(tr,path, screen):
+def Comments(tr,path, screen, ori):
     n = []
-    i=0
-    file_2 = pd.read_excel(path + "/AAD/Python/Comments.xlsx")
+
+    if ori == 'L':
+        file_2 = pd.read_excel(path + "/AAD/Python/Comments_L.xlsx")
+    elif ori == 'R':
+        file_2 = pd.read_excel(path + "/AAD/Python/Comments_R.xlsx")
+
+
     text2 = visual.TextStim(screen, text="'스페이스 바' 를 누르시면 다음 페이지로 넘어갑니다.", pos=(0, -400), height=33,
                             color=[1, 1, 1], wrapWidth=1500)
     size = 50
