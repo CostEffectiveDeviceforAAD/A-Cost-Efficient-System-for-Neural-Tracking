@@ -32,8 +32,8 @@ subject = ''
 
 ###########
 
-loc = 'kist'
-#loc = 'hyu'
+#loc = 'kist'
+loc = 'hyu'
 
 if loc == 'kist':
     arduino = "COM8"
@@ -51,8 +51,8 @@ port = serial.Serial(arduino, 9600)
 board, args = Brainflow_stream(cyton)
 
 ##################
-original = 'L'
-opposite = 'R'
+original = 'R'
+opposite = 'L'
 
 # ----------------------------- Load Speech segment data ------------------------------#
 
@@ -130,12 +130,6 @@ while toc - tic < 10:  # During 20s
     aux_data = input[aux_channels, :]
     print(aux_data)  # Check input Trigger
 
-    # If Nan value is entered, restart
-    if True in np.isnan(np.asarray(eeg_data)):
-        print("******************")
-        print("Input NAN!")
-        print("******************")
-        break
     key = event.getKeys()
     if key == ["escape"]:
         core.quit()
@@ -147,11 +141,11 @@ print("Warming up End")
 
 # -------------------------------------- Intro ---------------------------------------------#
 file = pd.read_excel(path + "/AAD/Python/question.xlsx")
-#file_2 = pd.read_excel(path + "/AAD/Python/Comments.xlsx")
 file_3 = pd.read_excel(path + "/AAD/Python/prePractice.xlsx")
 
 event.waitKeys(keyList=['space'], clearEvents=True)
 Comments('intro', path, screen,original)
+
 
 # ---------------------------------------- Practice ----------------------------------------#
 # Comment
@@ -164,10 +158,12 @@ for p in range(0, 2):
     port.write(b'3')  # practice speech
     practice(p, path, screen)
 
+
 # ==================================================================================================#
 # -------------------------------------- START EXPERIMENT ------------------------------------------#
 # ==================================================================================================#
 
+# Comment before first session.
 Comments(tr, path, screen,original)
 
 # ---------- Start 30 trial ----------#

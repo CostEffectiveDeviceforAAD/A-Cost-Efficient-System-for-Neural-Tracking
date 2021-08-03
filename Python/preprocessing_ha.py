@@ -30,16 +30,22 @@ def FIR_filter(data, lowcut, highcut, fs, order):   # FIR
 def Preproccessing(win,srate, low, high, order):
 
     #### Re-reference ####
-    for t in range(0, len(win.T)):
+    for t in range(0, len(win.T)):  # win : channel by samples
         re = np.mean(win[:, t])
         win[:, t] = win[:, t] - re
 
     #### Filtering ####
 
-    # FIR
-    win = FIR_filter(win, low, high, srate, order)  # order 조정필요.
-    # IIR
-    #win = butter_bandpass_filter(win, low, high, srate, order)
+    try:
+        # FIR
+        win = FIR_filter(win, low, high, srate, order)  # order 조정필요.
+        # IIR
+        #win = butter_bandpass_filter(win, low, high, srate, order)
+
+    except ValueError:  # To extend length of data by using zeropad, when data is too short.
+        win = np.concatenate((win, np.zeros((len(win), 20)), axis=1))
+        print("zeropadding")
+
 
     #### Resampling ####
 
