@@ -27,8 +27,8 @@ from Brainflow_stream import *
 
 #########
 
-subject = '0812_LKS'
-#subject = '0726_KKM'
+subject = 'reref'
+#subject = ''
 
 ###########
 
@@ -51,8 +51,8 @@ port = serial.Serial(arduino, 9600)
 board, args = Brainflow_stream(cyton)
 
 ##################
-original = 'R'
-opposite = 'L'
+original = 'L'
+opposite = 'R'
 
 # ----------------------------- Load Speech segment data ------------------------------#
 
@@ -138,6 +138,7 @@ while toc - tic < 10:  # During 20s
     toc = time.perf_counter()
 
 print("Warming up End")
+
 
 # -------------------------------------- Intro ---------------------------------------------#
 file = pd.read_excel(path + "/AAD/Python/question.xlsx")
@@ -378,9 +379,8 @@ while tr < 30:  # 30
             pass
 
         #=======  Data acquisition for rest  =======#
-        input = board.get_board_data()
 
-        # Separate EEG, AUX
+        input = board.get_board_data()
         eeg_data = input[eeg_channels, :]
         aux_data = input[aux_channels, :]  # 11,12,13 / 0 or 1
 

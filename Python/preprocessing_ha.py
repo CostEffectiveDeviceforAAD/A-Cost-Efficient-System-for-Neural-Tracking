@@ -34,6 +34,20 @@ def Preproccessing(win,srate, low, high, order):
         re = np.mean(win[:, t])
         win[:, t] = win[:, t] - re
 
+    '''
+    #### Re-reference ####
+    for c in range(0,15):
+        m = np.mean(win[c,:])
+        win[c,:] = win[c,:] - m
+
+
+    for t in range(0, len(win.T)):  # win : channel by samples
+        re_1 = np.mean(win[:7, t])
+        re_2 = np.mean(win[7:, t])
+        win[:7, t] = win[:7, t] - re_1
+        win[7:, t] = win[7:, t] - re_2
+    '''
+
     #### Filtering ####
 
     try:
@@ -43,8 +57,9 @@ def Preproccessing(win,srate, low, high, order):
         #win = butter_bandpass_filter(win, low, high, srate, order)
 
     except ValueError:  # To extend length of data by using zeropad, when data is too short.
-        win = np.concatenate((win, np.zeros((len(win), 20)), axis=1))
-        print("zeropadding")
+        win = np.concatenate((win, np.zeros((len(win), 50))), axis = 1)
+        print("***** zero padding *****")
+        win = FIR_filter(win, low, high, srate, order)  # order 조정필요.
 
 
     #### Resampling ####

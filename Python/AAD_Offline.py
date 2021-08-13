@@ -24,11 +24,11 @@ from Direction import *
 # -------------------------------- SETTING ---------------------------------#
 
 #########
-subject = ''
+subject = 'off'
 ###########
 
-#loc = 'kist'
-loc = 'hyu'
+loc = 'kist'
+#loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -47,13 +47,18 @@ stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
 # Load data
 
-raw_mat = io.loadmat(path + '/Recording data/0726_KKM/RAW_0726_KKM.mat')
+raw_mat = io.loadmat(path + '/Recording data/0806_LJH/RAW_0806_LJH.mat')
 raw = raw_mat['RAW']        # channel by time
 raw = np.concatenate((raw, np.ones([16,100])), axis=1)  # for final trial (lack of time)
-tri_mat = io.loadmat(path + '/Recording data/0726_KKM/TRIGGER_0726_KKM.mat')
+tri_mat = io.loadmat(path + '/Recording data/0806_LJH/TRIGGER_0806_LJH.mat')
 tri = tri_mat['TRIGGER']    # 3 by time
 
-ch = 2
+###
+
+
+
+
+
 '''
 raw_mat = io.loadmat('C:/Users/user/Desktop/hy-kist/OpenBCI/AAK/Seg.mat')
 eeg = raw_mat['eeg']    # channel by time by trial
@@ -251,7 +256,6 @@ while tr < 30:  # 30
         Pre_R.append(predic_r)
         print("\n==================================\n")
         print("Present Accuracy = {0}%".format(ACC[-1] * 100))
-        print("Present Channel = {0}".format(ch))
         print("\n==================================\n")
 
         #=============================================================
@@ -269,7 +273,6 @@ while tr < 30:  # 30
         Pre_R.append(predic_r)
         print("\n==================================\n")
         print("Present Accuracy = {0}%".format(ACC[-1] * 100))
-        print("Present Channel = {0}".format(ch))
         print("\n==================================\n")
 
     print(tr)

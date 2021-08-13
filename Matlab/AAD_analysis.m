@@ -1,8 +1,11 @@
 %% Real-time AAD analysis
-clear
+%clear
 
-sub = '_01LJW'
-subject = 1
+sub = '_0812_LKS'
+subject = 7
+
+% sub = '_0811_JJH'
+% subject = 5
 
 %% Behavior
 file = strcat('Behavior',sub, '.mat');
@@ -45,18 +48,24 @@ title('Behavior Result')
 file = strcat('Accuracy',sub, '.mat');
 load(file)  % Acc
 
-C = readtable('C:\Users\user\Desktop\hy-kist\OpenBCI\AAD\Matlab\result.xlsx');
+data = readtable('C:\Users\LeeJiWon\Desktop\OpenBCI\Recording data\result.xlsx');
 
 overall = mean(Acc*100);
 fixed = mean(Acc(1:12)*100);
 switching = mean(Acc(13:16)*100);
 
-data = [C; table(subject,overall, fixed, switching)]
+%data = table(subject, overall, fixed, switching, accb_at, accb_un)  % first suvject
+data = [data; table(subject, overall, fixed, switching, accb_at, accb_un)]
 
 chance = 52.99
 
 %% Write to Excel file 
 writetable(data, 'C:\Users\LeeJiWon\Desktop\OpenBCI\Recording data\result.xlsx');
+
+%% Read previous AAD result
+
+pre_data = readtable('C:\Users\LeeJiWon\Desktop\OpenBCI\OnlineAAD_Performance.xlsx');
+
 
 %% subject_total
 %C = readtable('result_sample.xlsx');
@@ -83,10 +92,10 @@ title('Total')
 Y = []
 X = []
 
-for sub = 1:length(C.subject)
+for sub = 1:length(data.subject)
     name = strcat('Sub', num2str(sub));
     X = [X, categorical({name})];
-    Y = [Y; table2array(C(sub,2:4))];
+    Y = [Y; table2array(data(sub,2:4))];
     
 end
 
@@ -110,7 +119,8 @@ train_mean_ori = mean(Acc(31:end));
 
 %% channel search
 clear
-load 'C:\Users\user\Desktop\hy-kist\OpenBCI\save_data\Accuracy_chloc.mat' 
+%load 'C:\Users\user\Desktop\hy-kist\OpenBCI\save_data\Accuracy_chloc.mat' 
+load 'C:\Users\LeeJiWon\Desktop\OpenBCI\save_data\Accuracy_chloc.mat' 
 
 for i = 1:size(Acc,1)
     check_Acc(i) = mean(Acc(i,1:14))*100;
@@ -215,37 +225,43 @@ end
 %16,17,18,24,25,
 
 %% bar and spot
-
+Y=[]
+X=[]
+X = categorical({'Overall','Fixed','Switching'});
 X = reordercats(X,{'Overall','Fixed','Switching'});
 
 for sub = 1: length(data.subject)
-    Y = [Y; table2array(C(sub,2:end))];
+    Y = [Y; table2array(data(sub,2:end))];
 end
 
-Ym = mean(Y, 1)
+Ym = mean(Y(:,1:3), 1)
 
 b = bar(X, Ym);  hold on
-plot(X, Y', '-o');
+plot(X, Y(:,1:3)', '--o');
 grid on
-ylim([0 80])
+ylim([0 100])
 ylabel('Accuracy(%)')
 % refline([0, chance]);
 title('Total')
 
-%% bar and spot -ex
-Y=[]
+%% bar and spot - comparision
+Y=[];
 X = categorical({'Overall','Fixed','Switching'});
 X = reordercats(X,{'Overall','Fixed','Switching'});
 
-for sub = 1: size(C,1)
-    Y = [Y; table2array(C(sub,2:4))];
+for sub = 1: size(data,1)
+    Y = [Y; table2array(data(sub,2:4))];
 end
 
-Ym = [mean(Y, 1); mean(Y, 1)+10];
+% previour result
+pre_Y = table2array(pre_data(:,2:4));
 
-b = bar(X, Ym);  
+Ym = [mean(Y, 1); mean(pre_Y, 1)];
+
+b = bar(X, Ym);  hold on
+%plot(X, Y', '-o');
 grid on
-ylim([0 80])
+ylim([0 100])
 ylabel('Accuracy(%)')
 set(gcf, 'color', 'white')
 legend('OpenBCI', 'Neuroscan');
