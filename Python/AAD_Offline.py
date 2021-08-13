@@ -71,7 +71,7 @@ fs = 64
 tmin = 0
 tmax = 250
 Dir = -1
-reg_lambda = 10
+reg_lambda = 0.000001
 train = 14
 ##############################################
 # Set int
