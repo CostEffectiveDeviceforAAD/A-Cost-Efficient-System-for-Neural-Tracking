@@ -26,7 +26,7 @@ def FIR_filter(data, lowcut, highcut, fs, order):   # FIR
 
 #4 Filter order = /Normalised width of transition band
 
-#print("a")
+
 def Preproccessing(win,srate, low, high, order):
 
     #### Re-reference ####
@@ -36,16 +36,10 @@ def Preproccessing(win,srate, low, high, order):
 
     #### Filtering ####
 
-    try:
-        # FIR
-        win = FIR_filter(win, low, high, srate, order)  # order 조정필요.
-        # IIR
-        #win = butter_bandpass_filter(win, low, high, srate, order)
-
-    except ValueError:  # To extend length of data by using zeropad, when data is too short.
-        win = np.concatenate((win, np.zeros((len(win), 20)), axis=1))
-        print("zeropadding")
-
+    # FIR
+    win = FIR_filter(win, low, high, srate, order)  # order 조정필요.
+    # IIR
+    #win = butter_bandpass_filter(win, low, high, srate, order)
 
     #### Resampling ####
 
