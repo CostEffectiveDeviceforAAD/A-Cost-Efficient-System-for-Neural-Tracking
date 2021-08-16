@@ -3,9 +3,12 @@
 clear
 %% load data_AAK
 
+sub = '0806_LJH'
+file = strcat('C:\Users\LeeJiWon\Desktop\OpenBCI\Recording data\', sub, '\E_', sub, '.mat')
+file2 = strcat('C:\Users\LeeJiWon\Desktop\OpenBCI\Recording data\', sub, '\A_', sub, '.mat')
 % Stim & Resp load
-load 'C:\Users\LeeJiWon\Desktop\OpenBCI\save_data\0721_BSC\E_0721_BSC.mat'      % EEG ;1by30 cell / timeby channel
-load 'C:\Users\LeeJiWon\Desktop\OpenBCI\save_data\0721_BSC\A_0721_BSC.mat'
+load(file)      % EEG ;1by30 cell / timeby channel
+load(file2)
 load 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Matlab\Allspeech.mat' 
 
 %% Decoder
@@ -67,7 +70,8 @@ end
 Dir = -1;             
 tmin = 0;         
 tmax = 250;            
-lambda = 10.^(-6:10:6); 
+%lambda = 2.^(0:2:20); 
+lambda = 10.^(-6:2:6)
 fs = 64              
 
 

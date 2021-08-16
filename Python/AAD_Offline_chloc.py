@@ -27,8 +27,8 @@ from Direction import *
 subject = '_chloc'
 ###########
 
-#loc = 'kist'
-loc = 'hyu'
+loc = 'kist'
+#loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -111,7 +111,11 @@ for i in range(0, len(ind) - 1):
         onset.append(ind[i])
 onset.append(ind[len(ind) - 1])
 
+<<<<<<< HEAD
 for ch in [0,4,5,6,8,9,10,11,12,13,14,15]:
+=======
+for ch in [0,1,2,3,4,5,6,8,9,10,11,12,13,14,15]:
+>>>>>>> hajiy
 
     while tr < 30:  # 30
 
@@ -140,10 +144,14 @@ for ch in [0,4,5,6,8,9,10,11,12,13,14,15]:
             # preprocessing_ha.py
 
             # Select channel
+<<<<<<< HEAD
             win = win[[ch,1,2,3],:]
+=======
+            #win = win[[ch,],:]
+>>>>>>> hajiy
 
             win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
-            #win = win[[ch], :]
+            win = win[[ch], :]
 
             # ------------------------------- Train set -------------------------------#
             if tr < train:  # int train

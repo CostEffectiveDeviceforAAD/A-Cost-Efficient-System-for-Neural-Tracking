@@ -47,10 +47,10 @@ stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
 # Load data
 
-raw_mat = io.loadmat(path + '/Recording data/0728_CTM/RAW_0728_CTM.mat')
+raw_mat = io.loadmat(path + '/Recording data/0812_LKS/RAW_0812_LKS.mat')
 raw = raw_mat['RAW']        # channel by time
 raw = np.concatenate((raw, np.ones([16,100])), axis=1)  # for final trial (lack of time)
-tri_mat = io.loadmat(path + '/Recording data/0728_CTM/TRIGGER_0728_CTM.mat')
+tri_mat = io.loadmat(path + '/Recording data/0812_LKS/TRIGGER_0812_LKS.mat')
 tri = tri_mat['TRIGGER']    # 3 by time
 
 ch = 2

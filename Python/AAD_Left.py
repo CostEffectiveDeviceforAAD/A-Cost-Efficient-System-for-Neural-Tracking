@@ -27,13 +27,13 @@ from Brainflow_stream import *
 
 #########
 
-subject = ''
-#subject = '0726_KKM'
+subject = '0812_YKH'
+#subject = ''
 
 ###########
 
-#loc = 'kist'
-loc = 'hyu'
+loc = 'kist'
+#loc = 'hyu'
 
 if loc == 'kist':
     arduino = "COM8"
@@ -111,7 +111,7 @@ tr = 0  # trial
 
 # ----------------------------- Make the window for Psychopy -----------------------------#
 
-screen = visual.Window([960, 900], screen=0, pos=[600, 0], fullscr=False,
+screen = visual.Window([960, 900], screen=1, pos=[600, 0], fullscr=True,
                        winType='pyglet', allowGUI=False, allowStencil=False,
                        monitor='testMonitor', color=[-1, -1, -1], blendMode='avg',
                        units='pix')
@@ -311,7 +311,7 @@ while tr < 30:  # 30
                     else:
                         acc = 0
 
-                    print("======= acc : {0} ".format(acc))
+                    print("======= acc : {0} =======".format(acc))
 
                     # Save acc for entire Accuracy
                     Acc = np.append(Acc, acc)
