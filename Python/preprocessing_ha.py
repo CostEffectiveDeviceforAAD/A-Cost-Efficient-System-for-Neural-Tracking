@@ -50,12 +50,11 @@ def Preproccessing(win,srate, low, high, order):
 
     #### Filtering ####
 
-<<<<<<< HEAD
     # FIR
     win = FIR_filter(win, low, high, srate, order)  # order 조정필요.
     # IIR
     #win = butter_bandpass_filter(win, low, high, srate, order)
-=======
+
     try:
         # FIR
         win = FIR_filter(win, low, high, srate, order)  # order 조정필요.
@@ -66,8 +65,6 @@ def Preproccessing(win,srate, low, high, order):
         win = np.concatenate((win, np.zeros((len(win), 50))), axis = 1)
         print("***** zero padding *****")
         win = FIR_filter(win, low, high, srate, order)  # order 조정필요.
-
->>>>>>> hajiy
 
     #### Resampling ####
 

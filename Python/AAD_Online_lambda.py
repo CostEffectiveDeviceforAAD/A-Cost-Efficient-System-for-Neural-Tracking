@@ -24,11 +24,11 @@ from Direction import *
 # -------------------------------- SETTING ---------------------------------#
 
 #########
-subject = '_chloc'
+subject = '_onlambda'
 ###########
 
-loc = 'kist'
-#loc = 'hyu'
+#loc = 'kist'
+loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -46,14 +46,15 @@ stim_R = allspeech[:30, :]  # 30 by 3840  Twenty   // trial by time
 stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
 # Load data
-
-raw_mat = io.loadmat(path + '/Recording data/0806_KKW/RAW_0806_KKW.mat')
+sub = '0809_LJH'
+raw_mat = io.loadmat(path + '/Recording data/'+ sub + '/RAW_' + sub + '.mat')
 raw = raw_mat['RAW']        # channel by time
 raw = np.concatenate((raw, np.ones([16,100])), axis=1)  # for final trial (lack of time)
-tri_mat = io.loadmat(path + '/Recording data/0806_KKW/TRIGGER_0806_KKW.mat')
+tri_mat = io.loadmat(path + '/Recording data/' + sub + '/TRIGGER_' + sub + '.mat')
 tri = tri_mat['TRIGGER']    # 3 by time
 
-ch = 2
+###
+
 '''
 raw_mat = io.loadmat('C:/Users/user/Desktop/hy-kist/OpenBCI/AAK/Seg.mat')
 eeg = raw_mat['eeg']    # channel by time by trial
@@ -66,7 +67,7 @@ fs = 64
 tmin = 0
 tmax = 250
 Dir = -1
-reg_lambda = 10
+reg_lambda = 0.01
 train = 14
 ##############################################
 # Set int
@@ -112,10 +113,11 @@ for i in range(0, len(ind) - 1):
 onset.append(ind[len(ind) - 1])
 
 
-for ch in [0,4,5,6,8,9,10,11,12,13,14,15]:
+for idx in range(-6,6):
 
+    reg_lambda = 10**(idx)
 
-    while tr < 30:  # 30
+    for tr in range(0,30):  # 30
 
         # ----------------------------- Trigger detection -----------------------------#
         # per trial
@@ -141,15 +143,8 @@ for ch in [0,4,5,6,8,9,10,11,12,13,14,15]:
             # ----------------------------- Pre-processing -----------------------------#
             # preprocessing_ha.py
 
-            # Select channel
-
-            win = win[[ch,1,2,3],:]
-
-            #win = win[[ch,],:]
-
-
+            win = np.delete(win, 7, axis=0)
             win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
-            win = win[[ch], :]
 
             # ------------------------------- Train set -------------------------------#
             if tr < train:  # int train
@@ -161,33 +156,8 @@ for ch in [0,4,5,6,8,9,10,11,12,13,14,15]:
 
                 'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'
 
-                #================================================================
-
-                pred_l, r_l, p, mse = mtrf_predict(stim_L[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
-                                                 Dir, tmin, tmax, inter)
-                pred_r, r_r, p, mse = mtrf_predict(stim_R[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
-                                                 Dir, tmin, tmax, inter)
-
-                predic_l.append(pred_l)
-                predic_r.append(pred_r)
-
-                print("Train")
-                # Stock correlation value per window(i)
-                r_L = np.append(r_L, r_l)
-                r_R = np.append(r_R, r_r)
-
-                ######  Estimate accuracy  #####
-                if r_l > r_r:
-                    acc = 1
-                else:
-                    acc = 0
-
-                print("======= acc : {0} ".format(acc))
-
-                # Save acc for entire Accuracy
-                Acc = np.append(Acc, acc)
-
                 #===========================================================================
+
 
                 # Sum w - window
                 if i == 0:
@@ -260,15 +230,16 @@ for ch in [0,4,5,6,8,9,10,11,12,13,14,15]:
             Pre_R.append(predic_r)
             print("\n==================================\n")
             print("Present Accuracy = {0}%".format(ACC[-1] * 100))
-            print("Present Channel = {0}".format(ch))
             print("\n==================================\n")
 
             #=============================================================
         elif state == "Test set":
+            # Stack correlation value collected during one trial
+            entr_L.append(r_L)
+            entr_R.append(r_R)
 
             r_L = []
             r_R = []
-
 
             # Collect Accuracy per trial
             ACC = np.append(ACC, np.mean(Acc))
@@ -276,15 +247,19 @@ for ch in [0,4,5,6,8,9,10,11,12,13,14,15]:
             Pre_R.append(predic_r)
             print("\n==================================\n")
             print("Present Accuracy = {0}%".format(ACC[-1] * 100))
-            print("Present Channel = {0}".format(ch))
             print("\n==================================\n")
 
         print(tr)
-        tr = tr + 1
 
-    Accuracy.append(ACC)  # 채널 당
+        w = 1
+
+    Accuracy.append(ACC)
+    print("done one trial")
+    print("Accuracy = {0}%".format(mean(ACC[14:]) * 100))
+    print("Present index = {0}".format(idx))
     ACC = []
-    tr = 0
+
+# ----------------------------- 30 trial End -----------------------------#
 
 
 print("The End")
@@ -294,6 +269,7 @@ print("The End")
 # Save per trial // eeg, trigger, accuracy ,behavior
 Accuracy = np.asarray(Accuracy)
 scipy.io.savemat(path + '/save_data/Accuracy' + subject + '.mat', {'Acc': Accuracy})
+
 
 
 
