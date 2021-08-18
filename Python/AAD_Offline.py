@@ -24,11 +24,11 @@ from Direction import *
 # -------------------------------- SETTING ---------------------------------#
 
 #########
-subject = 'off'
+subject = '_on'
 ###########
 
-loc = 'kist'
-#loc = 'hyu'
+#loc = 'kist'
+loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -46,11 +46,11 @@ stim_R = allspeech[:30, :]  # 30 by 3840  Twenty   // trial by time
 stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
 # Load data
-
-raw_mat = io.loadmat(path + '/Recording data/0806_LJH/RAW_0806_LJH.mat')
+sub = '0809_LJH'
+raw_mat = io.loadmat(path + '/Recording data/'+ sub + '/RAW_' + sub + '.mat')
 raw = raw_mat['RAW']        # channel by time
 raw = np.concatenate((raw, np.ones([16,100])), axis=1)  # for final trial (lack of time)
-tri_mat = io.loadmat(path + '/Recording data/0806_LJH/TRIGGER_0806_LJH.mat')
+tri_mat = io.loadmat(path + '/Recording data/' + sub + '/TRIGGER_' + sub + '.mat')
 tri = tri_mat['TRIGGER']    # 3 by time
 
 ###
@@ -71,7 +71,7 @@ fs = 64
 tmin = 0
 tmax = 250
 Dir = -1
-reg_lambda = 0.000001
+reg_lambda = 0.01
 train = 14
 ##############################################
 # Set int
@@ -117,6 +117,7 @@ for i in range(0, len(ind) - 1):
 onset.append(ind[len(ind) - 1])
 
 
+
 while tr < 30:  # 30
 
     # ----------------------------- Trigger detection -----------------------------#
@@ -157,7 +158,7 @@ while tr < 30:  # 30
             'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'
 
             #================================================================
-
+            '''
             pred_l, r_l, p, mse = mtrf_predict(stim_L[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
                                              Dir, tmin, tmax, inter)
             pred_r, r_r, p, mse = mtrf_predict(stim_R[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
@@ -178,10 +179,10 @@ while tr < 30:  # 30
                 acc = 0
 
             print("======= acc : {0} ".format(acc))
-
+            
             # Save acc for entire Accuracy
             Acc = np.append(Acc, acc)
-
+            '''
             #===========================================================================
 
 
