@@ -3,8 +3,8 @@
 clear
 %% load data_AAK
 clear
-path = 'C:\Users\user\Desktop\hy-kist\OpenBCI\Recording data\'
-%path = 'C:\Users\LeeJiWon\Desktop\OpenBCI\Recording data\'
+%path = 'C:\Users\user\Desktop\hy-kist\OpenBCI\Recording data\'
+path = 'C:\Users\LeeJiWon\Desktop\OpenBCI\Recording data\'
 sub = '0810_YKW'
 
 file = strcat(path, sub, '\E_', sub, '.mat')
@@ -15,8 +15,8 @@ load(file)      % EEG ;1by30 cell / timeby channel
 load(file2)
 
 % Stim load
-%load 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Matlab\Allspeech.mat' 
-load 'C:\Users\user\Desktop\hy-kist\OpenBCI\AAD\Matlab\Allspeech.mat'
+load 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Matlab\Allspeech.mat' 
+%load 'C:\Users\user\Desktop\hy-kist\OpenBCI\AAD\Matlab\Allspeech.mat'
 
 %% Struct stim, resp 
 

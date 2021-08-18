@@ -27,8 +27,8 @@ from Direction import *
 subject = '_on'
 ###########
 
-#loc = 'kist'
-loc = 'hyu'
+loc = 'kist'
+#loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -157,32 +157,7 @@ while tr < 30:  # 30
 
             'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'
 
-            #================================================================
-            '''
-            pred_l, r_l, p, mse = mtrf_predict(stim_L[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
-                                             Dir, tmin, tmax, inter)
-            pred_r, r_r, p, mse = mtrf_predict(stim_R[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
-                                             Dir, tmin, tmax, inter)
 
-            predic_l.append(pred_l)
-            predic_r.append(pred_r)
-
-            print("Train")
-            # Stock correlation value per window(i)
-            r_L = np.append(r_L, r_l)
-            r_R = np.append(r_R, r_r)
-
-            ######  Estimate accuracy  #####
-            if r_l > r_r:
-                acc = 1
-            else:
-                acc = 0
-
-            print("======= acc : {0} ".format(acc))
-            
-            # Save acc for entire Accuracy
-            Acc = np.append(Acc, acc)
-            '''
             #===========================================================================
 
 

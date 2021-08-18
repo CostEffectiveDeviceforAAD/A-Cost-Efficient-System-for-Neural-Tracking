@@ -27,8 +27,8 @@ from Direction import *
 subject = '_onlambda'
 ###########
 
-#loc = 'kist'
-loc = 'hyu'
+loc = 'kist'
+#loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -46,7 +46,7 @@ stim_R = allspeech[:30, :]  # 30 by 3840  Twenty   // trial by time
 stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
 # Load data
-sub = '0809_LJH'
+sub = '0812_YKH'
 raw_mat = io.loadmat(path + '/Recording data/'+ sub + '/RAW_' + sub + '.mat')
 raw = raw_mat['RAW']        # channel by time
 raw = np.concatenate((raw, np.ones([16,100])), axis=1)  # for final trial (lack of time)
@@ -67,7 +67,7 @@ fs = 64
 tmin = 0
 tmax = 250
 Dir = -1
-reg_lambda = 0.01
+#reg_lambda = 0.01
 train = 14
 ##############################################
 # Set int
@@ -255,7 +255,7 @@ for idx in range(-6,6):
 
     Accuracy.append(ACC)
     print("done one trial")
-    print("Accuracy = {0}%".format(mean(ACC[14:]) * 100))
+    #print("Accuracy = {0}%".format(mean(ACC[0,14:]) * 100))
     print("Present index = {0}".format(idx))
     ACC = []
 
@@ -267,8 +267,9 @@ print("The End")
 #### save ####
 # mat save
 # Save per trial // eeg, trigger, accuracy ,behavior
-Accuracy = np.asarray(Accuracy)
-scipy.io.savemat(path + '/save_data/Accuracy' + subject + '.mat', {'Acc': Accuracy})
+Accuracy2 = np.asarray(Accuracy)
+
+scipy.io.savemat(path + '/save_data/Accuracy' + subject + '.mat', {'Acc': Accuracy2})
 
 
 
