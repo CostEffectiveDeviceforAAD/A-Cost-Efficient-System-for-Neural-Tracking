@@ -35,14 +35,16 @@ set(gcf, 'color', 'white')
 %%
 figure
 plot(tlag, all_mean*100, '-ok');
-ylim([30,100])
+ylim([50,100])
 grid on
 set(gcf, 'color', 'white')
+title('all')
 
 %%
 figure
 plot(tlag, all_mean_f*100, '-ok');
-ylim([30,100])
+ylim([50,100])
 grid on
 set(gcf, 'color', 'white')
+title('flase')
 
