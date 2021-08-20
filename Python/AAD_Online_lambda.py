@@ -11,14 +11,14 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from pylsl import StreamInlet, resolve_stream, StreamInfo
 # from OpenBCI_lsl import *
-from scipy import signal, io
+from scipy import signal, io, linalg
 from scipy.signal import butter, lfilter, resample, filtfilt
-# from helper import *
 from pymtrf import *
 from psychopy import visual, core, event
 from preprocessing_ha import *
 from Comments import *
 from Direction import *
+from helper import *
 
 
 # -------------------------------- SETTING ---------------------------------#
@@ -27,14 +27,13 @@ from Direction import *
 subject = '_onlambda'
 ###########
 
-loc = 'kist'
-#loc = 'hyu'
+#loc = 'kist'
+loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
 elif loc == 'hyu':
     path = 'C:/Users/user/Desktop/hy-kist/OpenBCI'
-
 
 # ----------------------------- Load Speech segment data ------------------------------#
 
@@ -46,20 +45,13 @@ stim_R = allspeech[:30, :]  # 30 by 3840  Twenty   // trial by time
 stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
 # Load data
-sub = '0812_YKH'
+sub = '0811_JJH'
 raw_mat = io.loadmat(path + '/Recording data/'+ sub + '/RAW_' + sub + '.mat')
 raw = raw_mat['RAW']        # channel by time
 raw = np.concatenate((raw, np.ones([16,100])), axis=1)  # for final trial (lack of time)
 tri_mat = io.loadmat(path + '/Recording data/' + sub + '/TRIGGER_' + sub + '.mat')
 tri = tri_mat['TRIGGER']    # 3 by time
 
-###
-
-'''
-raw_mat = io.loadmat('C:/Users/user/Desktop/hy-kist/OpenBCI/AAK/Seg.mat')
-eeg = raw_mat['eeg']    # channel by time by trial
-
-'''
 # ----------------------------- Parameter Setting -----------------------------#
 #srate = 1000
 srate = 125
@@ -67,7 +59,7 @@ fs = 64
 tmin = 0
 tmax = 250
 Dir = -1
-#reg_lambda = 0.01
+reg_lambda = 10
 train = 14
 ##############################################
 # Set int
@@ -113,7 +105,7 @@ for i in range(0, len(ind) - 1):
 onset.append(ind[len(ind) - 1])
 
 
-for idx in range(-6,6):
+for idx in [1]:
 
     reg_lambda = 10**(idx)
 
@@ -154,9 +146,45 @@ for idx in range(-6,6):
                 model, tlag, inter = mtrf_train(stim_L[tr:tr + 1, 64 * (i) : 64 * (15 + i)].T, win.T, fs, Dir,
                                                 tmin, tmax, reg_lambda)
 
-                'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'
+                'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'   #channel by tau by 1
 
                 #===========================================================================
+
+                # def train
+
+                stim = stim_L[tr:tr + 1, 64 * (i) : 64 * (15 + i)].T
+                resp = win.T
+
+                if stim.shape[0] < stim.shape[1]:
+                    warnings.warn(f'stim: more features {stim.shape[0]} ' +
+                                  f'than samples {stim.shape[1]}, check input dimensions!')
+                if resp.shape[0] < resp.shape[1]:
+                    warnings.warn(f'resp: more features {resp.shape[0]} ' +
+                                  f'than samples {resp.shape[1]}, check input dimensions!')
+
+                assert tmin < tmax, 'tmin has to be smaller than tmax'
+                assert reg_lambda > 0, 'reg_lambda has to be positive and larger than 0!'
+
+                x, y, tmin, tmax = stimulus_mapping(Dir, stim, resp, tmin, tmax)
+
+                t_min = np.floor(tmin / 1e3 * fs * Dir).astype(int)
+                t_max = np.ceil(tmax / 1e3 * fs * Dir).astype(int)
+
+                lags_range = lag_builder(t_min, t_max)
+                lags = lags_range[0:1]
+                lag_x = lag_gen(x, lags)
+                x_input = np.hstack([np.ones(x.shape), lag_x])
+                n_feat = x_input.shape[1]
+
+                if x.shape[1] == 1:
+                    reg_matrix = quadratic_regularization(n_feat)
+                else:
+                    reg_matrix = np.eye(n_feat)
+
+                coefficients = regularized_regression_fit(x_input, y, reg_matrix, reg_lambda)
+                model, intercept = coefficient_to_model(coefficients, x.shape[1],
+                                                        lags.shape[0], y.shape[1])
+                time_lags = lags / fs * 1e3
 
 
                 # Sum w - window
@@ -178,6 +206,48 @@ for idx in range(-6,6):
                                                  Dir, tmin, tmax, inter)
                 pred_r, r_r, p, mse = mtrf_predict(stim_R[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
                                                  Dir, tmin, tmax, inter)
+
+                ##################################
+
+                # Define x and y
+                assert tmin < tmax, 'Value of tmin must be < tmax'
+
+                if constant is None:
+                    constant = np.zeros((model.shape[0], model.shape[2]))
+                else:
+                    assert np.all(constant.shape == np.array([model.shape[0],
+                                                              model.shape[2]]))
+
+                x, y, tmin, tmax = stimulus_mapping(mapping_direction, stim, resp, tmin, tmax)
+
+                t_min = np.floor(tmin / 1e3 * fs * mapping_direction).astype(int)
+                t_max = np.ceil(tmax / 1e3 * fs * mapping_direction).astype(int)
+
+                #lags = lag_builder(t_min, t_max)
+                lags_range = lag_builder(t_min, t_max)
+                lags = lags_range[0:1]
+
+                x_lag = np.hstack([np.ones(x.shape), lag_gen(x, lags)])
+
+                model = model_to_coefficients(model, constant)
+
+                pred = regularized_regression_predict(x_lag, model)
+
+                # Calculate accuracy
+                if y is not None:
+                    r = np.zeros((1, y.shape[1]))
+                    p = np.zeros((1, y.shape[1]))
+                    mse = np.zeros((1, y.shape[1]))
+                    for i in range(y.shape[1]):
+                        r[:, i], p[:, i] = pearsonr(y[:, i], pred[:, i])
+                        mse[:, i] = np.mean((y[:, i] - pred[:, i]) ** 2)
+                else:
+                    r = None
+                    p = None
+                    mse = None
+
+            #########################
+
 
                 predic_l.append(pred_l)
                 predic_r.append(pred_r)
