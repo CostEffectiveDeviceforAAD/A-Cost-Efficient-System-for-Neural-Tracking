@@ -1,6 +1,8 @@
 %%
 clear
 
+all_acc=[]
+all_false=[]
 %%
 acc = Acc(:,15:30);
 mean_acc = mean(acc,2);
@@ -27,24 +29,43 @@ all_mean_f = mean(all_false,2);
 %%
 
 figure
-plot(tlag, mean_acc*100, '-ok');
-ylim([30,100])
-grid on
+plot(tlag, all_acc*100, '-ok');  %'LineWidth', 2);
+ylim([50,80])
+ylabel('Accuracy (%)')
+xlabel('Time-lags (ms)')
+title('Accuracy at individual time-lags')
 set(gcf, 'color', 'white')
 
 %%
 figure
-plot(tlag, all_mean*100, '-ok');
-ylim([50,100])
-grid on
+plot(tlag, all_mean.*100, '-k', 'LineWidth', 3);
+ylim([30,80])
 set(gcf, 'color', 'white')
-title('all')
+xlim([0 407])
+ylabel('Accuracy (%)')
+xlabel('Time-lags (ms)')
+%title('Accuracy at individual time-lags')
+box('off')
 
 %%
 figure
 plot(tlag, all_mean_f*100, '-ok');
-ylim([50,100])
-grid on
+ylim([50,80])
 set(gcf, 'color', 'white')
-title('flase')
+ylabel('Accuracy (%)')
+xlabel('Time-lags (ms)')
+title('Accuracy at individual time-lags (False)')
+
+%% two
+figure
+plot(tlag, all_mean*100, 'LineWidth', 3); hold on
+plot(tlag, all_mean_f*100, 'LineWidth', 3);
+ylim([50,80])
+set(gcf, 'color', 'white')
+xlim([0 407])
+ylabel('Accuracy (%)')
+xlabel('Time-lags (ms)')
+colororder([0 0 0; 0.7 0.7 0.7])
+%title('Accuracy at individual time-lags')
+box('off')
 

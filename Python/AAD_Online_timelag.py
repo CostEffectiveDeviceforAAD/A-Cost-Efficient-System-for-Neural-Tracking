@@ -26,11 +26,11 @@ import warnings
 # -------------------------------- SETTING ---------------------------------#
 
 #########
-subject = '_timelag'
+subject = '_timelag_in'
 ###########
 
-#loc = 'kist'
-loc = 'hyu'
+loc = 'kist'
+#loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -48,9 +48,9 @@ stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
 
 
-for sub in range(2,12):
+for sub in range(1,12):
     # Load data
-    #sub = '0806_LJH'
+    #sub = '0726_KKM'
     sub = str(sub)
     raw_mat = io.loadmat(path + '/Recording data/'+ sub + '/RAW_' + sub + '.mat')
     raw = raw_mat['RAW']        # channel by time
@@ -166,7 +166,7 @@ for sub in range(2,12):
 
                         ##
                         lags_range = lag_builder(t_min, t_max)
-                        lags = lags_range[26-idx:27]
+                        lags = lags_range[26-idx:27-idx]
                         #lags = lag_builder(t_min, t_max)
                         ##
 
@@ -230,7 +230,7 @@ for sub in range(2,12):
 
                         #lags = lag_builder(t_min, t_max)
                         lags_range = lag_builder(t_min, t_max)
-                        lags = lags_range[26-idx:27]
+                        lags = lags_range[26-idx:27-idx]           #[26-idx:27]
                         ##
 
                         x_lag = np.hstack([np.ones(x.shape), lag_gen(x, lags)])
