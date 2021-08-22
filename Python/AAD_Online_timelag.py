@@ -29,8 +29,8 @@ import warnings
 subject = '_timelag_in'
 ###########
 
-loc = 'kist'
-#loc = 'hyu'
+#loc = 'kist'
+loc = 'hyu'
 
 if loc == 'kist':
     path = 'C:/Users/LeeJiWon/Desktop/OpenBCI'
@@ -190,7 +190,7 @@ for sub in range(1,12):
                 ##################
 
                     ## mTRF train function ##
-                    model, tlag, inter = mtrf_train(stim_L[tr:tr + 1, 64 * (i) : 64 * (15 + i)].T, win.T, fs, Dir,
+                    model, tlag, inter = mtrf_train(stim_R[tr:tr + 1, 64 * (i) : 64 * (15 + i)].T, win.T, fs, Dir,
                                                     tmin, tmax, reg_lambda, idx)
 
                     'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'   #channel by tau by 1
@@ -269,7 +269,7 @@ for sub in range(1,12):
                     r_R = np.append(r_R, r_r)
 
                     ######  Estimate accuracy  #####
-                    if r_l > r_r:
+                    if r_r > r_l:
                         acc = 1
                     else:
                         acc = 0
