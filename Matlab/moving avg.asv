@@ -171,17 +171,98 @@ mov_acc_swi_7 = mean(mov_acc_all(4,13:end));
 
 %%
 
-total_acc_all_1 = [67.39, 67.53, 70.11, 88.32, 63.18, 73.51, 60.05];
+total_acc_all_1 = [67.39,67.53,70.11,88.32,63.18,73.51,60.05];
 total_acc_all_3 = [67.39,69.02,69.96,90.49,63.04,74.05,60.73];
 total_acc_all_5 = [68.75,70.11,69.70,91.03,63.45,73.64,60.46];
 total_acc_all_7 = [70.11,69.16,70.79,91.30,64.81,74.32,61.14];
 
 total_acc_fix_1 = [68.12,69.20,72.83,91.85,63.59,76.09,62.50];
 total_acc_fix_3 = [67.93,71.20,74.64,93.30,63.41,76.27,63.77];
-total_acc_fix_5 = [68.75,70.11,69.70,91.03,63.45,73.64,60.46];
-total_acc_fix_7 = [70.11,69.16,70.79,91.30,64.81,74.32,61.14];
+total_acc_fix_5 = [68.66,72.49,74.28,93.66,63.95,76.06,63.41];
+total_acc_fix_7 = [69.57,71.20,75.54,93.66,65.40,76.27,63.77];
+
+total_acc_swi_1 = [65.22,63.04,61.96,77.72,61.96,65.76,52.72];
+total_acc_swi_3 = [65.76,62.50,55.98,82.07,61.96,67.39,51.63];
+total_acc_swi_5 = [69.02,63.04,55.98,83.15,61.96,66.30,51.63];
+total_acc_swi_7 = [71.74,63.04,56.52,84.24,63.04,68.48,53.26];
+
+total_mean_all_1 = mean(total_acc_all_1);
+std_all_1 = std(total_acc_all_1);
+total_mean_all_3 = mean(total_acc_all_3);
+std_all_3 = std(total_acc_all_3);
+total_mean_all_5 = mean(total_acc_all_5);
+std_all_5 = std(total_acc_all_5);
+total_mean_all_7 = mean(total_acc_all_7);
+std_all_7 = std(total_acc_all_7);
     
-    
+total_mean_fix_1 = mean(total_acc_fix_1);
+std_fix_1 = std(total_acc_fix_1);
+total_mean_fix_3 = mean(total_acc_fix_3);
+std_fix_3 = std(total_acc_fix_3);
+total_mean_fix_5 = mean(total_acc_fix_5);
+std_fix_5 = std(total_acc_fix_5);
+total_mean_fix_7 = mean(total_acc_fix_7);
+std_fix_7 = std(total_acc_fix_7);
+
+total_mean_swi_1 = mean(total_acc_swi_1);
+std_swi_1 = std(total_acc_swi_1);
+total_mean_swi_3 = mean(total_acc_swi_3);
+std_swi_3 = std(total_acc_swi_3);
+total_mean_swi_5 = mean(total_acc_swi_5);
+std_swi_5 = std(total_acc_swi_5);
+total_mean_swi_7 = mean(total_acc_swi_7);
+std_swi_7 = std(total_acc_swi_7);
+
+%% weighted moving average
+
+n=7
+
+for tr = 1:16
+    for i = 1:46
+         if i >= n
+             for k = 0:n-1
+                % att
+                wv_at(k+1) = Corr_att(tr,i-(k))*(n-k);        
+                % un
+                wv_un(k+1) = Corr_un(tr,i-(k))*(n-k);        
+             end
+             
+             wma_at(tr,i) = sum(wv_at)/(n*(n+1)/2);
+             wma_un(tr,i) = sum(wv_un)/(n*(n+1)/2);
+             
+         else 
+             for k = 0:i-1
+                 % att
+                wv_at(k+1) = Corr_att(tr,i-(k))*(i-k);        
+                % un
+                wv_un(k+1) = Corr_un(tr,i-(k))*(i-k);        
+             end
+             
+             wma_at(tr,i) = sum(wv_at)/(i*(i+1)/2);
+             wma_un(tr,i) = sum(wv_un)/(i*(i+1)/2);
+             
+         end
+         wv_at = [];
+         wv_un = [];
+        % estimate
+        if wma_at(tr,i) > wma_un(tr,i)
+            acc(tr,i) = 1;
+        else acc(tr,i) = 0;
+        end
+    end
+end
+
+mean_acc = mean(acc,2);
+
+mean_all = mean(mean_acc);
+mean_fix = mean(mean_acc(1:12));
+mean_swi = mean(mean_acc(13:16));
+
+%%
+
+a_1 = std(66.98	68.75	69.7	90.22	63.86	74.05	60.46
+
+
 
 
 

@@ -213,6 +213,81 @@ std_swi_5 = std(total_acc_swi_5);
 total_mean_swi_7 = mean(total_acc_swi_7);
 std_swi_7 = std(total_acc_swi_7);
 
+%% weighted moving average
+
+n=7
+
+for tr = 1:16
+    for i = 1:46
+         if i >= n
+             for k = 0:n-1
+                % att
+                wv_at(k+1) = Corr_att(tr,i-(k))*(n-k);        
+                % un
+                wv_un(k+1) = Corr_un(tr,i-(k))*(n-k);        
+             end
+             
+             wma_at(tr,i) = sum(wv_at)/(n*(n+1)/2);
+             wma_un(tr,i) = sum(wv_un)/(n*(n+1)/2);
+             
+         else 
+             for k = 0:i-1
+                 % att
+                wv_at(k+1) = Corr_att(tr,i-(k))*(i-k);        
+                % un
+                wv_un(k+1) = Corr_un(tr,i-(k))*(i-k);        
+             end
+             
+             wma_at(tr,i) = sum(wv_at)/(i*(i+1)/2);
+             wma_un(tr,i) = sum(wv_un)/(i*(i+1)/2);
+             
+         end
+         wv_at = [];
+         wv_un = [];
+        % estimate
+        if wma_at(tr,i) > wma_un(tr,i)
+            acc(tr,i) = 1;
+        else acc(tr,i) = 0;
+        end
+    end
+end
+
+mean_acc = mean(acc,2);
+
+mean_all = mean(mean_acc);
+mean_fix = mean(mean_acc(1:12));
+mean_swi = mean(mean_acc(13:16));
+
+%% weight
+
+a_3 = std([66.98	68.75	69.7	90.22	63.86	74.05	60.46]);
+a_5 = std([67.53	69.7	69.84	90.9	63.86	74.05	60.46]);
+a_7 = std([68.48	70.24	70.52	91.03	63.86	74.59	61.28]);
+
+f_3 = std([67.39	70.29	74.46	93.3	64.49	76.09	63.41]);
+f_5 = std([67.93	71.92	74.46	93.66	64.31	76.27	63.77]);
+f_7 = std([68.3	72.64	75.18	93.66	64.67	76.45	64.49]);
+
+s_3 = std([65.76	64.13	55.43	80.98	61.96	67.93	51.63]);
+s_5 = std([66.3	63.04	55.98	82.61	62.5	67.39	50.54]);
+s_7 = std([69.02	63.04	56.52	83.15	61.41	69.02	51.63]);
+
+%% offline
+
+a_3 = std([76.36	79.35	82.07	99.73	70.52	92.8	66.71]);
+a_5 = std([82.22	85.33	86.68	100	74.18	97.15	72.83]);
+a_7 = std([86.14	89.67	88.32	100	74.46	99.18	75]);
+
+f_3 = std([76.81	79.53	85.14	100	69.2	95.29	69.02]);
+f_5 = std([84.06	84.6	91.3	100	69.75	99.28	76.45]);
+f_7 = std([89.31	88.04	94.02	100	71.74	99.82	78.8]);
+
+s_3 = std([75	78.8	72.83	98.91	74.46	85.33	59.78]);
+s_5 = std([76.63	87.5	72.83	100	87.5	90.76	61.69]);
+s_7 = std([76.63	94.57	71.2	100	82.61	97.28	63.59]);
+
+
+
 
 
 

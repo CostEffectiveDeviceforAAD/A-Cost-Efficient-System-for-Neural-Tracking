@@ -296,22 +296,6 @@ title('Real-time accuracy')
 box('off')
 
 %% conditions
-X = categorical({'sub02','sub05','sub06','sub07','sub09','sub10','sub11'});
-X = reordercats(X,{'sub02','sub05','sub06','sub07','sub09','sub10','sub11'});
-
-
-ma = [70.11	69.16	70.79	91.3	64.81	74.32	61.14];
-wma = [68.48	70.24	70.52	91.03	63.86	74.59	61.28];
-real = [67.39 67.53 70.11 88.32 63.18 73.51 60.05];
-
-thre = [real; ma; wma];
-
-bar(X, thre);
-ylim([0 100])
-ylabel('Accuracy(%)')
-set(gcf, 'color', 'white')
-legend('real-time', 'moving average', 'weighted wa')
-box('off')
 
 
 
