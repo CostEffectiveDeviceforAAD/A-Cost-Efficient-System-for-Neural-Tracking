@@ -11,22 +11,20 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from pylsl import StreamInlet, resolve_stream, StreamInfo
 # from OpenBCI_lsl import *
-from scipy import signal, io, linalg
+from scipy import signal, io
 from scipy.signal import butter, lfilter, resample, filtfilt
+# from helper import *
 from pymtrf import *
 from psychopy import visual, core, event
 from preprocessing_ha import *
 from Comments import *
 from Direction import *
-from helper import *
-from scipy.stats import pearsonr
-import warnings
 
 
 # -------------------------------- SETTING ---------------------------------#
 
 #########
-subject = '_MVAVG'
+subject = '_fre28'
 ###########
 
 loc = 'kist'
@@ -37,6 +35,7 @@ if loc == 'kist':
 elif loc == 'hyu':
     path = 'C:/Users/user/Desktop/hy-kist/OpenBCI'
 
+
 # ----------------------------- Load Speech segment data ------------------------------#
 
 # Load All speech
@@ -46,24 +45,25 @@ allspeech = np.load(path + '/AAD/Python/Allspeech.npy')
 stim_R = allspeech[:30, :]  # 30 by 3840  Twenty   // trial by time
 stim_L = allspeech[30:, :]  # 30 by 3840  Journey  // trial by time
 
+for s in range(5,12):
 
-
-for sub in range(1,12):
     # Load data
-    #sub = '0726_KKM'
-    sub = str(sub)
+    sub = str(s)
     raw_mat = io.loadmat(path + '/Recording data/'+ sub + '/RAW_' + sub + '.mat')
     raw = raw_mat['RAW']        # channel by time
     raw = np.concatenate((raw, np.ones([16,100])), axis=1)  # for final trial (lack of time)
     tri_mat = io.loadmat(path + '/Recording data/' + sub + '/TRIGGER_' + sub + '.mat')
     tri = tri_mat['TRIGGER']    # 3 by time
 
+    ###
+
+
     # ----------------------------- Parameter Setting -----------------------------#
     #srate = 1000
     srate = 125
     fs = 64
     tmin = 0
-    tmax = 400
+    tmax = 250
     Dir = -1
     reg_lambda = 10
     train = 14
@@ -111,7 +111,8 @@ for sub in range(1,12):
     onset.append(ind[len(ind) - 1])
 
 
-    for tr in range(0,30):  # 30
+
+    while tr < 30:  # 30
 
         # ----------------------------- Trigger detection -----------------------------#
         # per trial
@@ -138,19 +139,21 @@ for sub in range(1,12):
             # preprocessing_ha.py
 
             win = np.delete(win, 7, axis=0)
-            win = Preproccessing(win, srate, 0.5, 8, 601)  # data, sampling rate, low-cut, high-cut, filter order
+            win = Preproccessing(win, srate, 2, 8, 401)  # data, sampling rate, low-cut, high-cut, filter order
 
             # ------------------------------- Train set -------------------------------#
             if tr < train:  # int train
                 state = "Train set"
 
                 ## mTRF train function ##
-                model, tlag, inter = mtrf_train(stim_R[tr:tr + 1, 64 * (i) : 64 * (15 + i)].T, win.T, fs, Dir,
+                model, tlag, inter = mtrf_train(stim_L[tr:tr + 1, 64 * (i) : 64 * (15 + i)].T, win.T, fs, Dir,
                                                 tmin, tmax, reg_lambda)
 
-                'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'   #channel by tau by 1
+                'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'
+
 
                 #===========================================================================
+
 
                 # Sum w - window
                 if i == 0:
@@ -166,31 +169,22 @@ for sub in range(1,12):
             else:
                 state = "Test set"
 
-                #########################
-
                 ## Calculate Predicted signal ##
                 pred_l, r_l, p, mse = mtrf_predict(stim_L[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
                                                  Dir, tmin, tmax, inter)
                 pred_r, r_r, p, mse = mtrf_predict(stim_R[tr:tr+1, 64 * (i) : 64 * (15 + i)].T, win.T, model, fs,
                                                  Dir, tmin, tmax, inter)
 
-                print("Test")
+                predic_l.append(pred_l)
+                predic_r.append(pred_r)
 
+                print("Test")
                 # Stock correlation value per window(i)
                 r_L = np.append(r_L, r_l)
-                    r_R = np.append(r_R, r_r)
-
-                # moving average
-                mv_l = mean(r_L[len(r_L)-idx : len(r_L)+1])
-                rm_L = np.append(rm_L, mv_l)
-
-                mv_r = mean(r_R[len(r_R)-idx : len(r_R)+1])
-                rm_R = np.append(rm_R, mv_r)
-
-
+                r_R = np.append(r_R, r_r)
 
                 ######  Estimate accuracy  #####
-                if r_r > r_l:
+                if r_l > r_r:
                     acc = 1
                 else:
                     acc = 0
@@ -228,8 +222,6 @@ for sub in range(1,12):
 
             print("Train_check_trial")  # 당연히 높게 나와야함
             ACC = np.append(ACC, np.mean(Acc))
-            Pre_L.append(predic_l)
-            Pre_R.append(predic_r)
             print("\n==================================\n")
             print("Present Accuracy = {0}%".format(ACC[-1] * 100))
             print("\n==================================\n")
@@ -245,26 +237,22 @@ for sub in range(1,12):
 
             # Collect Accuracy per trial
             ACC = np.append(ACC, np.mean(Acc))
-            Pre_L.append(predic_l)
-            Pre_R.append(predic_r)
             print("\n==================================\n")
             print("Present Accuracy = {0}%".format(ACC[-1] * 100))
             print("\n==================================\n")
 
-        print(tr)
 
+        print(tr)
+        tr = tr + 1
         w = 1
 
-    #---- sub
-    Accuracy.append(ACC)
-    print("done one trial")
-    #print("Accuracy = {0}%".format(mean(ACC[0,14:]) * 100))
-    print("Present index = {0}".format(sub))
-    ACC = []
+    Accuracy = np.asarray(ACC)
+    scipy.io.savemat(path + '/save_data/Accuracy' + subject + '_' + sub + '.mat', {'Acc': Accuracy})
 
-    Accuracy2 = np.asarray(Accuracy)
-    scipy.io.savemat(path + '/save_data/Accuracy' + subject + '_' + sub + '.mat', {'Acc': Accuracy2})
 # ----------------------------- 30 trial End -----------------------------#
+
+
+
 
 
 print("The End")
@@ -272,9 +260,8 @@ print("The End")
 #### save ####
 # mat save
 # Save per trial // eeg, trigger, accuracy ,behavior
-Accuracy2 = np.asarray(Accuracy)
 
-scipy.io.savemat(path + '/save_data/Accuracy' + subject + '_' + sub + '.mat', {'Acc': Accuracy2})
+
 
 
 

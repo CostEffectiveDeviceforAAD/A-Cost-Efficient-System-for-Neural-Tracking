@@ -7,6 +7,11 @@ subject = 7
 % sub = '_0811_JJH'
 % subject = 5
 
+%%
+all = mean(Acc(15:end));
+fix = mean(Acc(15:26));
+swi = mean(Acc(27:end));
+
 %% Behavior
 file = strcat('Behavior',sub, '.mat');
 load(file)
@@ -288,31 +293,44 @@ b = bar(X, barp, 'FaceColor', 'flat'); hold on
 b.CData(1,:) = [0 0.4470 0.7410]
 b.CData(2,:) = [0.8500 0.3250 0.0980]
 b.CData(3,:) = [0.9290 0.6940 0.1250]
-plot(X, barp_x, '--ok', 'MarkerFaceColor', [1 1 1]);
+plot(X, barp_x, '--ok', 'MarkerFaceColor', [1 1 1], 'LineWidth', 0.8);
 ylim([0 100])
 ylabel('Accuracy(%)')
 set(gcf, 'color', 'white')
 title('Real-time accuracy')
-box('off')
+%box('off')
 
 %% conditions
 X = categorical({'sub02','sub05','sub06','sub07','sub09','sub10','sub11'});
 X = reordercats(X,{'sub02','sub05','sub06','sub07','sub09','sub10','sub11'});
 
-
-ma = [70.11	69.16	70.79	91.3	64.81	74.32	61.14];
-wma = [68.48	70.24	70.52	91.03	63.86	74.59	61.28];
 real = [67.39 67.53 70.11 88.32 63.18 73.51 60.05];
+sma = [70.11	69.16	70.79	91.3	64.81	74.32	61.14];
+wma = [68.48	70.24	70.52	91.03	63.86	74.59	61.28];
+ema = [75 69.7 70.38 95.52 71.06 73.51 60.33];
 
-thre = [real; ma; wma];
+thre = [real; sma; wma; ema];
 
-bar(X, thre);
+b = bar(X, thre);
 ylim([0 100])
 ylabel('Accuracy(%)')
 set(gcf, 'color', 'white')
-legend('real-time', 'moving average', 'weighted wa')
-box('off')
+legend('Real-time', 'SMA', 'WMA', 'EMA')
+%box('off')
 
+%% fre 2-8
+
+all_28 = [ 58.56 60.05 72.69 70.92 56.11 56.39 51.09];
+fix_28 = [ 57.79 63.95 74.09 71.74 54.35 61.23 48.37];
+swi_28 = [ 60.87 48.37 68.48 68.48 61.41 41.85 59.24];
+
+mean_all_28 = mean(all_28);
+mean_fix-28 = mean(fix_28);
+mean_swi_28 = mean(swi_28);
+
+std_all_28 = std(all_28);
+std_fix_28 = std(fix_28);
+std_swi_28 = std(swi_28);
 
 
 

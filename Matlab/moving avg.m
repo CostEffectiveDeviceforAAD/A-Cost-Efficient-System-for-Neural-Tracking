@@ -286,6 +286,45 @@ s_3 = std([75	78.8	72.83	98.91	74.46	85.33	59.78]);
 s_5 = std([76.63	87.5	72.83	100	87.5	90.76	61.69]);
 s_7 = std([76.63	94.57	71.2	100	82.61	97.28	63.59]);
 
+%% Exponential MA
+
+ema_at = []
+ema_un = []
+
+for tr = 1:16
+    
+    ema_at(tr,1) = corr_l(tr,1);
+    ema_un(tr,1) = corr_r(tr,1);
+
+    for i = 2:46
+
+        a = 2/(i+1);
+        ema_at(tr,i) = (a*corr_l(tr,i)) + ((1-a)*ema_at(tr,i-1));
+        ema_un(tr,i) = (a*corr_r(tr,i)) + ((1-a)*ema_un(tr,i-1));
+        
+        if ema_at(tr,i) > ema_un(tr,i)
+            ema_corr(tr,i) = 1;
+        else ema_corr(tr,i) = 0;end
+    end
+    
+end
+
+ema_all = mean(mean(ema_corr,2))*100;
+ema_fix = mean(mean(ema_corr(1:12,:),2))*100;
+ema_swi = mean(mean(ema_corr(13:16,:),2))*100;
+            
+%%
+
+all = [75 69.7 70.38 95.52 71.06 60.33 73.51];
+fix = [75.54 68.12 75.36 96.2 71.92 63.04 74.64];
+swi = [75.37 74.46 55.43 93.48 68.48 52.17 70.11];
+
+mean_all = mean(all);
+std_all = std(all);
+mean_fix = mean(fix);
+std_fix = std(fix);
+mean_swi = mean(swi);
+std_swi = std(swi);
 
 
 

@@ -296,6 +296,26 @@ title('Real-time accuracy')
 box('off')
 
 %% conditions
+X = categorical({'sub02','sub05','sub06','sub07','sub09','sub10','sub11'});
+X = reordercats(X,{'sub02','sub05','sub06','sub07','sub09','sub10','sub11'});
+
+real = [67.39 67.53 70.11 88.32 63.18 73.51 60.05];
+sma = [70.11	69.16	70.79	91.3	64.81	74.32	61.14];
+wma = [68.48	70.24	70.52	91.03	63.86	74.59	61.28];
+ema = [75 69.7 70.38 95.52 71.06 60.33 73.51];
+
+thre = [real; sma; wma; ema];
+
+b = bar(X, thre);
+b.CData(:,1) = [0 0.4470 0.7410]
+b.CData(,:) = [0.8500 0.3250 0.0980]
+b.CData(3,:) = [0.9290 0.6940 0.1250]
+b.CData(4,:) = [0.4660 0.6740 0.1880]
+ylim([0 100])
+ylabel('Accuracy(%)')
+set(gcf, 'color', 'white')
+legend('Real-time', 'SMA', 'WMA', 'EMA')
+box('off')
 
 
 
