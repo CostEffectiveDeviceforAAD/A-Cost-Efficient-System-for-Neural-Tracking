@@ -313,7 +313,7 @@ ema_all = mean(mean(ema_corr,2))*100;
 ema_fix = mean(mean(ema_corr(1:12,:),2))*100;
 ema_swi = mean(mean(ema_corr(13:16,:),2))*100;
             
-%%
+%% ema
 
 all = [75 69.7 70.38 95.52 71.06 60.33 73.51];
 fix = [75.54 68.12 75.36 96.2 71.92 63.04 74.64];

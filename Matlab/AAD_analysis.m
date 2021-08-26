@@ -325,12 +325,43 @@ fix_28 = [ 57.79 63.95 74.09 71.74 54.35 61.23 48.37];
 swi_28 = [ 60.87 48.37 68.48 68.48 61.41 41.85 59.24];
 
 mean_all_28 = mean(all_28);
-mean_fix-28 = mean(fix_28);
+mean_fix_28 = mean(fix_28);
 mean_swi_28 = mean(swi_28);
 
 std_all_28 = std(all_28);
 std_fix_28 = std(fix_28);
 std_swi_28 = std(swi_28);
+
+%% 3 condition
+% real-time
+real_all = [67.39 67.53 70.11 88.32 63.18 60.05 73.51];
+real_mean_all = 70.01;
+% fre 2-8
+low_all = [ 58.56 60.05 72.69 70.92 56.11 56.39 51.09];
+low_mean_all = 60.83;
+% EMA
+ema_all = [75 69.7 70.38 95.52 71.06 60.33 73.51];
+ema_mean_all = 73.64;
+
+X = categorical({'Real-time','High-freq','EMA'});
+X = reordercats(X,{'Real-time','High-freq','EMA'});
+
+thre = [real_mean_all; low_mean_all; ema_mean_all];
+y = [real_all; low_all; ema_all];
+
+b=zeros(3,1);
+
+figure
+b(1) = bar(X(1), real_mean_all,'FaceColor', 'flat');  hold on
+b(2) = bar(X(2), low_mean_all, 'FaceColor', 'flat'); 
+b(3) = bar(X(3), ema_mean_all, 'FaceColor', 'flat'); 
+plot(X, y, '--ok', 'MarkerFaceColor', [1 1 1] ,'LineWidth', 1);
+ylim([0 100]);
+ylabel('Accuracy(%)');
+set(gcf, 'color', 'white'); hold off
+hleg = legend(b,'Real-time', 'High-freq', 'EMA', 'Location', 'southeast');
+set(hleg, 'FontSize', 12);
+
 
 
 

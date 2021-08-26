@@ -85,6 +85,86 @@ inter = np.zeros([16, 1])
 
 ##############################################
 
+def mtrf_train(stim, resp, fs, mapping_direction, tmin, tmax, reg_lambda, idx):
+    if stim.shape[0] < stim.shape[1]:
+        warnings.warn(f'stim: more features {stim.shape[0]} ' +
+                      f'than samples {stim.shape[1]}, check input dimensions!')
+    if resp.shape[0] < resp.shape[1]:
+        warnings.warn(f'resp: more features {resp.shape[0]} ' +
+                      f'than samples {resp.shape[1]}, check input dimensions!')
+
+    assert tmin < tmax, 'tmin has to be smaller than tmax'
+    assert reg_lambda > 0, 'reg_lambda has to be positive and larger than 0!'
+
+    x, y, tmin, tmax = stimulus_mapping(mapping_direction, stim, resp, tmin, tmax)
+
+    t_min = np.floor(tmin / 1e3 * fs * mapping_direction).astype(int)
+    t_max = np.ceil(tmax / 1e3 * fs * mapping_direction).astype(int)
+
+    ##
+    lags_range = lag_builder(t_min, t_max)
+    lags = lags_range[26 - idx:27 - idx]
+    # lags = lag_builder(t_min, t_max)
+    ##
+
+    lag_x = lag_gen(x, lags)
+    x_input = np.hstack([np.ones(x.shape), lag_x])
+    n_feat = x_input.shape[1]
+
+    if x.shape[1] == 1:
+        reg_matrix = quadratic_regularization(n_feat)
+    else:
+        reg_matrix = np.eye(n_feat)
+
+    coefficients = regularized_regression_fit(x_input, y, reg_matrix, reg_lambda)
+    model, inter = coefficient_to_model(coefficients, x.shape[1],
+                                        lags.shape[0], y.shape[1])
+    time_lags = lags / fs * 1e3
+
+    return model, time_lags, inter
+
+
+def mtrf_predict(stim, resp, model, fs, mapping_direction, tmin, tmax, constant, idx):
+    # Define x and y
+    assert tmin < tmax, 'Value of tmin must be < tmax'
+
+    if constant is None:
+        constant = np.zeros((model.shape[0], model.shape[2]))
+    else:
+        assert np.all(constant.shape == np.array([model.shape[0],
+                                                  model.shape[2]]))
+
+    x, y, tmin, tmax = stimulus_mapping(mapping_direction, stim, resp, tmin, tmax)
+
+    t_min = np.floor(tmin / 1e3 * fs * mapping_direction).astype(int)
+    t_max = np.ceil(tmax / 1e3 * fs * mapping_direction).astype(int)
+
+    # lags = lag_builder(t_min, t_max)
+    lags_range = lag_builder(t_min, t_max)
+    lags = lags_range[26 - idx:27 - idx]  # [26-idx:27]
+    ##
+
+    x_lag = np.hstack([np.ones(x.shape), lag_gen(x, lags)])
+
+    model = model_to_coefficients(model, constant)
+
+    pred = regularized_regression_predict(x_lag, model)
+
+    # Calculate accuracy
+    if y is not None:
+        r = np.zeros((1, y.shape[1]))
+        p = np.zeros((1, y.shape[1]))
+        mse = np.zeros((1, y.shape[1]))
+        for i in range(y.shape[1]):
+            r[:, i], p[:, i] = pearsonr(y[:, i], pred[:, i])
+            mse[:, i] = np.mean((y[:, i] - pred[:, i]) ** 2)
+    else:
+        r = None
+        p = None
+        mse = None
+
+    return pred, r, p, mse
+
 # ==================================================================================================#
 # -------------------------------------- START EXPERIMENT ------------------------------------------#
 # ==================================================================================================#
@@ -115,18 +195,20 @@ while train < 30:  # 30
 
         speech = onset[tr] + (srate * 3) + 1  # 3초 후 부터가 speech 이기에 +1
         win = raw[:, speech: speech + srate * 60]
-        #win = np.delete(win, 7, axis=0)
+        win = np.delete(win, 7, axis=0)
         win = Preproccessing(win, srate, 0.5, 8, 601)
 
         if tr != train:
+
+
             ## mTRF train function ##
             model, tlag, inter = mtrf_train(stim_L[tr:tr+1,:].T, win.T, fs, Dir,
-                                            tmin, tmax, reg_lambda)
+                                            tmin, tmax, reg_lambda, idx)
 
             'model - (16,17,1)  / tlag - (17,1) / inter - (16,1)'
 
-        model_w = np.add(model_w, model)
-        inter_w = np.add(inter_w, inter)
+            model_w = np.add(model_w, model)
+            inter_w = np.add(inter_w, inter)
 
     model = model_w / (29)
     inter = inter_w / (29)
@@ -136,14 +218,14 @@ while train < 30:  # 30
     # ------------------------------- Test set -------------------------------#
     speech = onset[train] + (srate * 3) + 1  # 3초 후 부터가 speech 이기에 +1
     win = raw[:, speech: speech + srate * 60]
-    #win = np.delete(win, 7, axis=0)
+    win = np.delete(win, 7, axis=0)
     win = Preproccessing(win, srate, 0.5, 8, 601)
 
     ## Calculate Predicted signal ##
     pred_l, r_l, p, mse = mtrf_predict(stim_L[train:train+1,:].T, win.T, model, fs,
-                                     Dir, tmin, tmax, inter)
+                                     Dir, tmin, tmax, inter, idx)
     pred_r, r_r, p, mse = mtrf_predict(stim_R[train:train+1,:].T, win.T, model, fs,
-                                     Dir, tmin, tmax, inter)
+                                     Dir, tmin, tmax, inter, idx)
 
     print("Test")
 
@@ -153,16 +235,10 @@ while train < 30:  # 30
     else:
         acc = 0
 
-    print("======= acc : {0} ".format(acc))
-
     # Save acc for entire Accuracy
-    Acc = np.append(Acc, acc)
+    Acc = np.append(Acc, acc)   # 한 트라이얼의 all corr
 
-    ACC.append(Acc)
-    print("\n==================================\n")
-    #print("Present Accuracy = {0}%".format(ACC[-1] * 100))
-    print("Present trial = {0}".format(train))
-    print("\n==================================\n")
+    ACC.append(Acc)     # 트라이얼마다의 corr
 
     train = train + 1
 
