@@ -129,7 +129,7 @@ def mtrf_predict(stim, resp, model, fs, mapping_direction, tmin, tmax, constant,
 
 ####
 
-for s in range(2,12):
+for s in range(8,12):
 
     sub = str(s)
     # Load data
@@ -201,9 +201,8 @@ for s in range(2,12):
 
                 if tr != train:
 
-
                     ## mTRF train function ##
-                    model, tlag, inter = mtrf_train(stim_R[tr:tr+1,:].T, win.T, fs, Dir,
+                    model, tlag, inter = mtrf_train(stim_L[tr:tr+1,:].T, win.T, fs, Dir,
                                                     tmin, tmax, reg_lambda, idx)
 
                     'model - (channel,17,1)  / tlag - (17,1) / inter - (16,1)'
@@ -233,7 +232,7 @@ for s in range(2,12):
             print("Test - {0}".format(train))
 
             ######  Estimate accuracy  #####
-            if r_r > r_l:
+            if r_l > r_r:
                 acc = 1
             else:
                 acc = 0
@@ -248,7 +247,7 @@ for s in range(2,12):
         Acc = []
 
     Accuracy = np.asarray(Accuracy)
-    scipy.io.savemat(path + '/save_data/Accuracy' + '_timelag_off_un_' + sub + '.mat', {'Acc': Accuracy})
+    scipy.io.savemat(path + '/save_data/Accuracy' + '_timelag_off_' + sub + '.mat', {'Acc': Accuracy})
     Accuracy = []
 
 

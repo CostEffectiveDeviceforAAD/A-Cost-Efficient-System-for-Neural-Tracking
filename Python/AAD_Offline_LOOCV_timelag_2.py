@@ -54,7 +54,7 @@ def mtrf_crossval(stim, stim2, resp, fs, mapping_direction, tmin, tmax, reg_lamb
 
 
     #n_trials, n_feat = test_input_dimensions(x_un)
-    n_trials, n_feat = test_input_dimensions(x_at)
+    n_trials, n_feat = test_input_dimensions(x)
 
     n_trl_y, n_targets = test_input_dimensions(y)
 
@@ -112,8 +112,10 @@ def mtrf_crossval(stim, stim2, resp, fs, mapping_direction, tmin, tmax, reg_lamb
             # Calculate accuracy
             for k in range(n_targets):
                 temp_pred = np.squeeze(pred[trial][c_lambda, :, k]).T
-                r[trial, c_lambda, k], p[trial, c_lambda, k] = pearsonr(y[trial][:, k], temp_pred)
+
                 r_un[trial, c_lambda, k], p[trial, c_lambda, k] = pearsonr(y_un[trial][:, k], temp_pred)
+                r[trial, c_lambda, k], p[trial, c_lambda, k] = pearsonr(y[trial][:, k], temp_pred)
+
 
                 mse[trial, c_lambda, k] = np.mean((y[trial][:, k] - temp_pred) ** 2)
 
@@ -162,6 +164,17 @@ for s in range(2,12):
     resp = []
     stim_at = []
     stim_un = []
+
+    # Trigger detection
+    dif = np.diff(tri[1,:])
+    ind = np.where(dif > 0)
+    ind = ind[0] + 1
+
+    for i in range(0, len(ind) - 1):
+        if ind[i + 1] - ind[i] != 1:
+            onset.append(ind[i])
+    onset.append(ind[len(ind) - 1])
+
     for tr in range(0, 30):  # 30 trial eeg data 쌓기
 
         speech = onset[tr] + (srate * 3) + 1  # 3초 후 부터가 speech 이기에 +1
@@ -184,16 +197,6 @@ for s in range(2,12):
 
 
     # ---------- Start 30 trial ----------#
-
-    # Trigger detection
-    dif = np.diff(tri[1,:])
-    ind = np.where(dif > 0)
-    ind = ind[0] + 1
-
-    for i in range(0, len(ind) - 1):
-        if ind[i + 1] - ind[i] != 1:
-            onset.append(ind[i])
-    onset.append(ind[len(ind) - 1])
 
 
     for idx in range(0,33):
