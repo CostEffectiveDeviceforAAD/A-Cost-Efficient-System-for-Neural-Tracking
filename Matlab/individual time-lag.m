@@ -15,7 +15,7 @@ tlag = flip(-[-406.25 , -390.625, -375, -359.375, -343.75 , -328.125, ...
     
     
 %%
-all_acc_f = [all_acc_f; Acc];
+all_acc = [all_acc; Acc];
 
 tlag =[-250.   , -234.375, -218.75 , -203.125, -187.5  , -171.875, ...
        -156.25 , -140.625, -125.   , -109.375,  -93.75 ,  -78.125, ...
@@ -48,9 +48,9 @@ title('Accuracy at individual time-lags')
 set(gcf, 'color', 'white')
 
 %%
-figure(2)
+figure(6)
 plot(tlag, all_mean.*100, 'k', 'LineWidth', 3);
-ylim([50,100])
+ylim([30,100])
 set(gcf, 'color', 'white')
 
 ylabel('Accuracy (%)')
@@ -61,7 +61,7 @@ box('off')
 %%
 figure
 plot(tlag, all_mean_f*100,'LineWidth', 3);
-ylim([50,100])
+ylim([30,100])
 set(gcf, 'color', 'white')
 ylabel('Accuracy (%)')
 xlabel('Time-lags (ms)')
