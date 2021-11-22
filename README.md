@@ -1,74 +1,52 @@
-# Auditory BCI for Online AAD
+# A Cost-effective device for Online AAD
 
-This is Auditory BCI for Real-time Auditory Attention Detection(AAD).
+Proposed cost-effective device for online AAD Library
 
-It can not only collect EEG data from human brain, but it can play sounds and record triggers corresponding to sound.
+It performs three functions required for online AAD experiment: EEG acquisition, Stimuli Presentation and Stimuli Trigger.
 
+This instruction contains information on how to conduct online AAD through the proposed device.
 
-## Requirements
+***
+## EEG Acquisition Module
+This device used [OpenBCI](https://openbci.com/?utm_source=google&utm_medium=cpc&utm_campaign=716348300&utm_content=openbci&gclid=Cj0KCQiA-eeMBhCpARIsAAZfxZBwfN8ei8seomxZ255WDN04UvwYix6hzXr-pJoc7drJViXE77-MirIaAnfWEALw_wcB) board (Cyton with Daisy) as EEG Acquisition Module. This can acquire 16 channels and send data to PC via bluetooth dongle.
 
-1. OpenBCI (for EEG data acquisition)
+Networking system for real time streaming selected the [Brainflow](https://github.com/brainflow-dev/brainflow) because of good accessibility and compatibility with OpenBCI. 
 
-    : OpenBCI cyton + daisy
-
-    : EEG Electrode Cap
-
-    https://openbci.com/
-
-2. Arduino UNO (for Trigger)
-
-    https://www.arduino.cc/
-
-3. WAV Trigger (for sound play)
-
-    : SD card
-
-    https://www.sparkfun.com/products/13660
-
----------------------------
-
-## OpenBCI 
-
+### Requirements
+1. OpenBCI Programming
 For OpenBCI board running with Arduino IDE, see the OpenBCI Tutorial and Library.
 
-https://docs.openbci.com/docs/02Cyton/CytonProgram
+>https://docs.openbci.com/docs/02Cyton/CytonProgram
 
-https://github.com/OpenBCI/OpenBCI_Cyton_Library
+>https://github.com/OpenBCI/OpenBCI_Cyton_Library
 
-------------------------------
+2. OPenBCI Streaming
 
-## Python LSL
+    The board receive EEG data and trigger data through EEG channels and jumper wire, and send these data to PC via bluetooth dongle.
+```
+Cyton_stream.ar
+```
 
-- Lab Streaming Layer (LSL) with python
+***
+## Stimuli Presentation
+Stimuli are presented via [WAV Trigger](https://github.com/robertsonics/WAV-Trigger-Arduino-Serial-Library). 
+Sound Stumuli for experiment are plugged in SD card. This used Arduino serial port for programming and is supplied power from arduino board.
 
-https://docs.openbci.com/docs/06Software/02-CompatibleThirdPartySoftware/LSL
+See Arduino Serial Contol Tutorial for WAV Trigger
+>http://robertsonics.com/2015/04/25/arduino-serial-control-tutorial/
 
-+ We use advanced LSL code ( Not OpenBCI_LSL library )
 
-https://docs.openbci.com/docs/09Deprecated/Python
-
--------------------------------
-
-## WAV Trigger
-
-WAV Trigger Tutorial & Library
-
-http://robertsonics.com/2015/04/25/arduino-serial-control-tutorial/
-
-https://github.com/robertsonics/WAV-Trigger-Arduino-Serial-Library
-
---------------------
-## Device Pradigm
-
-1. Start streaming with Python. (LSL) > EEG acquisition start 
-2. Start Experiment with Psychopy.
-3. Sends the signal of sound onset to Arduino via the Serial Port. [ 1. line ]
-4. Play sound from WAV Trigger via Arduino ( generated jitter ) and send Triggers on sound onset. [ 2. line ]
-5. Sound flows through earphone to subject and analog signals of sound are sent to Arduino at the same time. [ 3. line ]
-6. Detect sound onset timing in Arduino by analog signals of sound. [ 4. line ]
-7. Sends the tigger for the sound onset to Cyton + daisy ( No jitter ). [ 5. line ]
-8. Sends EEG data and Trigger to the desktop, received and recorded them by python. [ 6. line ]
+***
+## Stimuli Trigger
 
 
 
-![제목 없는 프레젠테이션](https://user-images.githubusercontent.com/85104167/120435956-4b9eda80-c3b9-11eb-9f6c-0167660a8a2e.jpg)
+
+
+***
+## Streaming and Visual presentatino via Python
+
+
+
+
+## Enclosure for the proposed device
