@@ -26,7 +26,7 @@ Networking system for real time streaming selected the [Brainflow](https://githu
 
     The board receive EEG data and trigger data through EEG channels and jumper wire, and send these data to PC via bluetooth dongle.
 ```
-Cyton_stream.ar
+OpenBCI board_stream.ino
 ```
 
 ***
