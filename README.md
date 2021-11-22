@@ -13,14 +13,16 @@ This device used [OpenBCI](https://openbci.com/?utm_source=google&utm_medium=cpc
 Networking system for real time streaming selected the [Brainflow](https://github.com/brainflow-dev/brainflow) because of good accessibility and compatibility with OpenBCI. 
 
 ### Requirements
-1. OpenBCI Programming
-For OpenBCI board running with Arduino IDE, see the OpenBCI Tutorial and Library.
+1. **OpenBCI Programming**
+
+    For OpenBCI board running with Arduino IDE, see the OpenBCI Tutorial and Library.
 
 >https://docs.openbci.com/docs/02Cyton/CytonProgram
 
 >https://github.com/OpenBCI/OpenBCI_Cyton_Library
 
-2. OPenBCI Streaming
+
+2. **OpenBCI Streaming**
 
     The board receive EEG data and trigger data through EEG channels and jumper wire, and send these data to PC via bluetooth dongle.
 ```
