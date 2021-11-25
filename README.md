@@ -1,11 +1,12 @@
 # A Cost-effective device for Online AAD
 
-Proposed cost-effective device for online AAD Library
-
-It performs three functions required for online AAD experiment: EEG acquisition, Stimuli Presentation and Stimuli Trigger.
+Proposed cost-effective device for online AAD Library. It performs three functions required for online AAD experiment: EEG acquisition, Stimuli Presentation and Stimuli Trigger.
+To test this device, we conducted online AAD experiment using this device and custom-made code. 
 
 This instruction contains information on how to conduct online AAD through the proposed device.
 
+refer to the detail process
+> my paper ... still preparing ...
 
 ***
 ## EEG Acquisition Module
@@ -42,18 +43,26 @@ See Arduino Serial Contol Tutorial for WAV Trigger
 
 ***
 ## Stimuli Trigger
+Stimuli trigger is synchronizatd throug Arduino UNO. Arduino UNO communicate with laptop(or PC) for trial onset and with WAV Trigger for stimuli (i.e, speech) onset. Finally, this send the trigger for stimuli onset to OpenBCI board. All signals are deliveried to the IO pin through jumper wire.  
 
+See custom-made code for Aduino UNO used in experiment.
 
-
-
+```
+AA code
+```
 
 ***
-## Streaming and Visual presentatino via Python
+## Streaming and Visual presentation and Data analysis via Python
+Custom-made code based on Python  -  data streaming and prepocessing and decoding process with mTRF and visual presentation with Psychopy.
 
+See custom-made code for all experimental processing
 
-
+```
+python code
+```
 
 ## Enclosure for the proposed device
+Encloeure of proposed device is producted by 3D printer with custom-made design. The dimension of the Encloeure is within 24 cm x 15 cm x 6 cm including cover (width x length x height). A Cover is made of acrilic material separately.
 
 
 ## Detail
