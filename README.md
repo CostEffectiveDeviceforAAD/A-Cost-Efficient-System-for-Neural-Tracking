@@ -24,7 +24,7 @@ This device used [OpenBCI](https://openbci.com/?utm_source=google&utm_medium=cpc
    Refer to follow code:
     
 ```
-DataAcquisition_OpenBCI.ino
+AcquisitionOpenBCI.ino
 ```
 
 ***
@@ -42,7 +42,7 @@ We used Arduino UNO to synchronizate between trigger and EEG data. Arduino UNO c
 See custom-made code for Aduino UNO used in experiment.
 
 ```
-AA code
+ArduinoTrigger.ino
 ```
 
 ***
