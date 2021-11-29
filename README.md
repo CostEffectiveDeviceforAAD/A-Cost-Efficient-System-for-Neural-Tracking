@@ -13,7 +13,7 @@ refer to the detail process
 
 ### 1.  EEG Acquisition Module
 
-This device used [OpenBCI](https://openbci.com/?utm_source=google&utm_medium=cpc&utm_campaign=716348300&utm_content=openbci&gclid=Cj0KCQiA-eeMBhCpARIsAAZfxZBwfN8ei8seomxZ255WDN04UvwYix6hzXr-pJoc7drJViXE77-MirIaAnfWEALw_wcB) (Cyton with Daisy) as EEG Acquisition Module. This can acquire 16 channels and send data to PC via bluetooth dongle. Networking system for real time streaming selected the [Brainflow](https://github.com/brainflow-dev/brainflow) because of good accessibility and compatibility with OpenBCI. 
+This device used [OpenBCI](https://openbci.com/?utm_source=google&utm_medium=cpc&utm_campaign=716348300&utm_content=openbci&gclid=Cj0KCQiA-eeMBhCpARIsAAZfxZBwfN8ei8seomxZ255WDN04UvwYix6hzXr-pJoc7drJViXE77-MirIaAnfWEALw_wcB) (Biosensingboard Cyton with Daisy) as EEG Acquisition Module. This can acquire 16 channels and send data to PC via bluetooth dongle. Networking system for real time streaming selected the [Brainflow](https://github.com/brainflow-dev/brainflow) because of good accessibility and compatibility with OpenBCI. 
 
   > For OpenBCI board running with Arduino IDE, see the OpenBCI Tutorial and Library.
   > 
