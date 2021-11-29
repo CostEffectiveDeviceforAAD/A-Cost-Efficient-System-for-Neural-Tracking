@@ -67,20 +67,20 @@ If you want to start from the left of attention direction,
 OnlineAAD_EXP_L.py
 `
 
-To use the code above, you have to include all functional code in Python folder. Also, you need to check your arduino and bluetooth COM port number.
+To use the code above, you have to include all functional code in Python folder. Also, you need to check your arduino, bluetooth COM port number and your directory of files.
 
 ***
 ## Enclosure for the proposed device
-Encloeure of proposed device is producted by 3D printer with custom-made design. The dimension of the Encloeure is within 24 cm x 15 cm x 6 cm including cover (width x length x height). A Cover is made of acrilic material separately.
+Encloeure of proposed device is producted by 3D printer with custom-made design. The dimension of the Encloeure is within 24 cm x 15 cm x 6 cm including cover (width x length x height). A Cover is made of acrilic material separately. 
+Refer to follow file:
 
-'
-Enclousere
-'
+`DeviceEnclosure.step`
+ or 
+`DeviceEnclosure.stl`
 
 
 ## Detail
-The proposed device consisted of
-
+The outside of device include serial port for arduino, power switching for OpenBCI board and two LED (shown as first figure), and volume controller, earphones jack and parallel port adapter for EEG electrode cap (shown as second figure). Two LED are for check the power on OpenBCI board and trigger on Arduino board and the volume control is worked through potentialmeter. The last figure shows the inside of device.
 
 ***
 
