@@ -69,8 +69,13 @@ OnlineAAD_EXP_L.py
 
 To use the code above, you have to include all functional code in Python folder. Also, you need to check your arduino and bluetooth COM port number.
 
+***
 ## Enclosure for the proposed device
 Encloeure of proposed device is producted by 3D printer with custom-made design. The dimension of the Encloeure is within 24 cm x 15 cm x 6 cm including cover (width x length x height). A Cover is made of acrilic material separately.
+
+'
+Enclousere
+'
 
 
 ## Detail
