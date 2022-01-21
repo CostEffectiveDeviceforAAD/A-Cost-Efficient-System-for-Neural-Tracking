@@ -21,7 +21,7 @@ from brainflow.data_filter import DataFilter, FilterTypes, AggOperations, Window
 from Brainflow_stream import *
 
 #################################################################################################
-# ---------------------------------- Experimental SETTING --------------------------------------#
+#---------------------------------- Experimental SETTING ---------------------------------------#
 #################################################################################################
 
 # set info
@@ -57,15 +57,9 @@ reg_lambda = 10     # Lambda value
 fs = 64             # post sampling rate
 
 # Set int
-r_J = []
-r_T = []
 ACC = []
 model_w = []
 inter_w = []
-entr_J = []
-entr_T = []
-EEG = []
-AUX = []
 Correct = []
 Answer = []
 start = []
@@ -103,6 +97,8 @@ for p in range(0, 2):
 # ==================================================================================================#
 RAWData = np.zeros((16, 1))    # EEG 16 channel by 1
 AUXData = np.zeros((3, 1))     # Trigger 3 channel by 1
+corr_T = np.zeros((16, 46))
+corr_J = np.zeros((16, 46))
 tr = 0  # trial number
 z = 1   # To avoid repeat when detect trigger
 j = 0   # Question number
@@ -141,7 +137,6 @@ while tr < 30:
         i = 0       # Window number
         work = 0    # Time count
         check = -3  # attention cue sound 3 second
-        Acc = []
 
         # ----------------------------- Working while 60s = one trial-----------------------------#
         # Find speech onset point exclude attention cue sound
@@ -205,19 +200,15 @@ while tr < 30:
                                                      Dir, tmin, tmax, inter)
                     pred, corr_t, p, mse = mtrf_predict(stim_T[tr:tr + 1, 64 * (i):64 * (i) + data_l].T, win.T, model, fs,
                                                      Dir, tmin, tmax, inter)
-
-                    # Stock correlation value per window(i)
-                    corr_J = np.append(corr_J, corr_j)
-                    corr_T = np.append(corr_T, corr_t)
-
                     # Compare with both correlation values
                     if corr_j > corr_t:
-                        acc = 1
+                        acc[tr-14,i] = 1
                     else:
-                        acc = 0
+                        acc[tr-14,i] = 0
 
-                    # Save acc for entire Accuracy
-                    Acc = np.append(Acc, acc)
+                    # Stock correlation value per window(i)
+                    corr_J[tr-14,i] = np.array(corr_j)
+                    corr_T[tr-14,i] = np.array(corr_t)
 
                 # Plus window number
                 i = i + 1
@@ -238,7 +229,7 @@ while tr < 30:
                 model_wt = model_w
                 inter_wt = inter_w
             elif tr > 0:
-                model_wt = np.add(model_wt, model_w)
+                model_wt[tr] = np.add(model_wt, model_w)
                 inter_wt = np.add(inter_wt, inter_w)
             # Average at last train trial
             if tr == 13:
@@ -246,14 +237,8 @@ while tr < 30:
                 inter = inter_wt / (i * (tr + 1))
 
         elif state == "Test set":
-            # Stack correlation value collected during one trial
-            Allcorr_J.append(corr_J)
-            Allcorr_T.append(corr_T)
-            corr_T = []
-            corr_J = []
-
             # Collect Accuracy per trial
-            ACC = np.append(ACC, np.mean(Acc))
+            ACC = np.append(ACC, np.mean(acc[tr-14:tr-13,:]))
             print("\n==================================\n")
             print("Present Accuracy = {0}%".format(ACC[-1] * 100))
             print("\n==================================\n")
@@ -282,15 +267,14 @@ while tr < 30:
         # numpy file
         np.save(path + '/save_data/RAW_' + subject, RAWData)
         np.save(path + '/save_data/AUX_' + subject, AUXData)
-        np.save(path + '/save_data/All_corr_att_' + subject, entr_J)
-        np.save(path + '/save_data/All_corr_unatt_' + subject, entr_T)
+        np.save(path + '/save_data/All_corr_att_' + subject, corr_J)
+        np.save(path + '/save_data/All_corr_unatt_' + subject, corr_T)
         np.save(path + '/save_data/Accuracy_' + subject, ACC)
         np.save(path + '/save_data/Behavior_' + subject, correct_all)
 
         # Format current trial
         tr = tr + 1
         z = 1
-
         # ------------------ comment about next session ---------------------#
         Comments(tr, path, screen, original)
 
