@@ -1,5 +1,5 @@
 """"""""""""""""""""""""""""""""""""""""""
-#        OpenBCI - Brainflow           #
+#        EMA-applied Accuracy           #
 #           For Online AAD              #
 """"""""""""""""""""""""""""""""""""""""""
 
@@ -70,11 +70,9 @@ print("Switch Accuracy = {0}%".format(mean(ACC[12:]*100)))
 print("The End")
 
 #### save ####
-'''
-Accuracy = np.asarray(Accuracy)
 np.save(path + '/save_data/Accuracy_EMA_' + sub, ACC)
 np.save(path + '/save_data/AllcorrJ_EMA_' + sub, EmaCorr_j)
 np.save(path + '/save_data/AllcorrT_EMA_' + sub, EmaCorr_t)
-'''
+
 
 
