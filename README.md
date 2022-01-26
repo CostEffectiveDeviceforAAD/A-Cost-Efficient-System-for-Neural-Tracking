@@ -55,19 +55,17 @@ ArduinoTrigger.ino
 
 All experimental processing includes data streaming, prepocessing, decoding process with mTRF, visual presentation with Psychopy and communication with arduino. This experimental processing is operated throught custom-made code based on python. See the code for experimental processing.
 
-If you want to start from the right of attention direction, 
+For conduction experiment, 
 
 `
-OnlineAAD_EXP_R.py
-`
-
-If you want to start from the left of attention direction, 
-
-`
-OnlineAAD_EXP_L.py
+OnlineAAD_EXP.py
 `
 
 To use the code above, you have to include all functional code in Python folder. Also, you need to check your arduino, bluetooth COM port number and your directory of files.
++ Other requires
+> https://github.com/SRSteinkamp/pymtrf
+
+> https://github.com/brainflow-dev/brainflow
 
 ***
 ## Enclosure for the proposed device
