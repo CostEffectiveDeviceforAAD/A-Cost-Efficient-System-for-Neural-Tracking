@@ -22,15 +22,8 @@ This device used [OpenBCI](https://openbci.com/?utm_source=google&utm_medium=cpc
   > https://github.com/OpenBCI/OpenBCI_Cyton_Library
 
 
-**Board Programming**
-
-   The board receive EEG data and trigger data through EEG channels and jumper wire, and send these data to PC via bluetooth dongle.
-   Refer to follow code:
-    
-`
-AcquisitionOpenBCI.ino
-`<br/>
-
+  - The board receive EEG data and trigger data through EEG channels and jumper wire, and send these data to PC via bluetooth dongle.
+   Refer to follow code:  `AcquisitionOpenBCI.ino`
 
 ### 2.  Stimuli Presentation
 Stimuli are presented via [WAV Trigger](https://github.com/robertsonics/WAV-Trigger-Arduino-Serial-Library). Sound stimuli for experiment are plugged in SD card. This used Arduino serial port for programming and is supplied power from arduino board.
@@ -40,26 +33,17 @@ Stimuli are presented via [WAV Trigger](https://github.com/robertsonics/WAV-Trig
 > http://robertsonics.com/2015/04/25/arduino-serial-control-tutorial/
 
 
-
 ### 3.  Stimuli Trigger
 We used Arduino UNO to synchronizate between trigger and EEG data. Arduino UNO communicate with laptop(or PC) for trial onset and with WAV Trigger for stimuli (i.e, speech) onset. Finally, this send the trigger for stimuli onset to OpenBCI board. All signals are deliveried to the IO pin through jumper wire.  
 
-See custom-made code for Aduino UNO used in experiment.
-
-`
-ArduinoTrigger.ino
-`
+-  You can use   `ArduinoTrigger.ino`   for Aduino UNO used in experiment.
 
 ***
 ## Experimental processing
 
 All experimental processing includes data streaming, prepocessing, decoding process with mTRF, visual presentation with Psychopy and communication with arduino. This experimental processing is operated throught custom-made code based on python. See the code for experimental processing.
 
-For conduction experiment, 
-
-`
-OnlineAAD_EXP.py
-`
+For conduction experiment, you can run the task through `OnlineAAD_EXP.py`
 
 To use the code above, you have to include all functional code in Python folder. Also, you need to check your arduino, bluetooth COM port number and your directory of files.
 + Other requires
