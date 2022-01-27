@@ -1,4 +1,4 @@
-# A Cost-effective device for Online AAD
+# Online AAD with Device Name
 
 We will propose a cost-effective device for online AAD library. It performs three functions required for online AAD experiment: EEG acquisition, Stimuli Presentation and Stimuli Trigger. To test this device, we conducted online AAD experiment using this device and custom-made code.
 
