@@ -1,6 +1,6 @@
-# Online AAD with Device Name
+# Online AAD with CEDA
 
-We will propose a cost-effective device for online AAD library. It performs three functions required for online AAD experiment: EEG acquisition, Stimuli Presentation and Stimuli Trigger. To test this device, we conducted online AAD experiment using this device and custom-made code.
+We will propose a cost-effective device for online AAD (CEDA). It performs three functions required for online AAD experiment: EEG acquisition, Stimuli Presentation and Stimuli Trigger. To test this device, we conducted online AAD experiment using this device and custom-made code.
 
 This instruction contains information on how to conduct online AAD experiment through the proposed device. 
 
