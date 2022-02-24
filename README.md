@@ -35,9 +35,6 @@ The sound trigger module used Arduino UNO. It not only receive the command for t
 
 To conduct the online AAD experiment, `OnlineAAD_EXP.py` includes data streaming, prepocessing, decoding process with mTRF, visual presentation with Psychopy and communication with arduino. It need 
 
-
-All experimental processing includes data streaming, prepocessing, decoding process with mTRF, visual presentation with Psychopy and communication with arduino. This experimental processing is operated throught custom-made code based on python. See the code for experimental processing.
-
 You can run the task through `OnlineAAD_EXP.py` along with custom-codes in Sub_Functions file.
 Also, you need to check your arduino, bluetooth COM port number and your directory of files.
 
@@ -47,9 +44,9 @@ Also, you need to check your arduino, bluetooth COM port number and your directo
 > https://github.com/brainflow-dev/brainflow
 
 ***
-## Enclosure for the proposed device
-Encloeure of proposed device is producted by 3D printer with custom-made design. The dimension of the Encloeure is within 24 cm x 15 cm x 6 cm including cover (width x length x height). A Cover is made of acrilic material separately. 
-Refer to follow file:
+## Enclosure
+Encloeure is producted by 3D printer with custom-made design. The dimension of the Encloeure is within 24 cm x 15 cm x 6 cm including cover (width x length x height). A Cover is made of acrilic material separately. 
+You can use following 3D design file:
 
 `DeviceEnclosure.step`
  or 
@@ -57,10 +54,8 @@ Refer to follow file:
 
 
 ## Detail
-The outside of device include serial port for arduino, power switching for OpenBCI board and two LED (shown as first figure), and volume controller, earphones jack and parallel port adapter for EEG electrode cap (shown as second figure). All modules are connected by jumper-wires. Two LED are for check the power on OpenBCI board and trigger on Arduino board and the volume control is worked through potentialmeter. The last figure shows the inside of device.
+The outside of CEDA include serial port for arduino, power switching for OpenBCI board and two LED (shown as first figure), and volume controller, earphones jack and parallel port adapter for EEG electrode cap (shown as second figure). Two LED are for check the power on OpenBCI board and trigger on Arduino board and the volume control is worked through potentialmeter. All modules are connected by jumper-wires (shown as final figure). The EEG acquisition module and sound trigger module are supplied from 5V DC power and COM port, and the sound player module is powered from the sound trigger module (i.e., arduin UNO).
 
-
-All signals are deliveried to the IO pin through jumper wire. 
 ***
 
 <img src="https://user-images.githubusercontent.com/85104167/142797442-7c8c5677-199c-4192-8cdf-e37cbf4d5fd9.jpg" width="600" height="400">
