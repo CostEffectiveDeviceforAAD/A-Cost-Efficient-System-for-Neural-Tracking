@@ -46,7 +46,7 @@ Also, you need to check your arduino, bluetooth COM port number and your directo
 
 ***
 ## Enclosure
-Encloeure is producted by 3D printer with custom-made design. The dimension of the Encloeure is within 24 cm x 15 cm x 6 cm including cover (width x length x height). A Cover is made of acrilic material separately. 
+Encloeure is producted by 3D printer with custom-made design. The dimension of the Encloeure is within 24 cm x 15 cm x 6 cm including cover (width x length x height). A Cover is made of acrilic material. 
 You can use following 3D design file:
 
 `DeviceEnclosure.step`
@@ -55,7 +55,7 @@ You can use following 3D design file:
 
 
 ## Detail
-The outside of CEDA include serial port for arduino, power switching for OpenBCI board and two LED (shown as first figure), and volume controller, earphones jack and parallel port adapter for EEG electrode cap (shown as second figure). Two LED are for check the power on OpenBCI board and trigger on Arduino board and the volume control is worked through potentialmeter. All modules are connected by jumper-wires (shown as final figure). The EEG acquisition module and sound trigger module are supplied from 5V DC power and COM port, and the sound player module is powered from the sound trigger module (i.e., arduin UNO).
+The outside of CEDA include DC power adapter, a switch of power for the EEG acquisition module, two LED and COM port adapter (described from left side, shown as first figure). Two LED are for checking the power on the EEG acquisition module and the trigger state on the sound trigger module. Second figure shown a parallel port adapter for EEG electrode cap, a volume controller using potentialmeter and an earphones stereo adapter. All modules are connected by jumper-wires (shown as final figure). The EEG acquisition module and sound trigger module are supplied from 5V DC power and COM port, and the sound player module is powered from the sound trigger module (5V).
 
 ***
 
