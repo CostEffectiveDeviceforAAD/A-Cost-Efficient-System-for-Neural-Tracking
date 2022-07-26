@@ -6,7 +6,7 @@ This instruction contains information on how to implement CEDA.
 You can read more about the project here [paper address].
 
 ## Essential Modules
-figure.1
+<img width="80%" src="https://user-images.githubusercontent.com/85104167/180901773-ea07b295-08eb-4860-a95a-27ae7a6ec707.jpg"/>
 
 ### EEG Acquisition Module
 
