@@ -1,6 +1,6 @@
 # Online AAD task
 
-This script contain several tasks to connect whether OpenBCI board (throught Brainflow) and Arduino board (Serial port) and to conduct online AAD task (includes EEG data preprocessing, mTRF,.etc)
+This script contain several tasks to connect whether OpenBCI board (throught Brainflow) and Arduino board (Serial port) and to conduct online AAD task (including EEG data preprocessing, mTRF,.etc).
 
 To run this script, you need additional scripts in the above folder. 
 
