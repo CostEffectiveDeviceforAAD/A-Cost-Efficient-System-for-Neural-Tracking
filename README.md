@@ -1,6 +1,6 @@
-# Online AAD with CEDA
+# Online AAD with a Cost-efficient System
 
-CEDA is a cost-effective, open-source device for online auditory attention detection and consists of an EEG acquisition module, a sound player module and a sound trigger module.
+This system is a cost-effective, open-source device for online auditory attention detection and consists of an EEG acquisition module, a sound player module and a sound trigger module.
 This instruction contains information on how to implement CEDA. 
 
 You can read more about the project here [paper address].
@@ -55,7 +55,7 @@ You can use following 3D design file:
 
 
 ## Detail
-The outside of CEDA include DC power adapter, a switch of power for the EEG acquisition module, two LED and COM port adapter (described from left side, shown as first figure). Two LED are for checking the power on the EEG acquisition module and the trigger state on the sound trigger module. Second figure shown a parallel port adapter for EEG electrode cap, a volume controller using potentialmeter and an earphones stereo adapter. All modules are connected by jumper-wires (shown as final figure). The EEG acquisition module and sound trigger module are supplied from 5V DC power and COM port, and the sound player module is powered from the sound trigger module (5V).
+The outside of the system include DC power adapter, a switch of power for the EEG acquisition module, two LED and COM port adapter (described from left side, shown as first figure). Two LED are for checking the power on the EEG acquisition module and the trigger state on the sound trigger module. Second figure shown a parallel port adapter for EEG electrode cap, a volume controller using potentialmeter and an earphones stereo adapter. All modules are connected by jumper-wires (shown as final figure). The EEG acquisition module and sound trigger module are supplied from 5V DC power and COM port, and the sound player module is powered from the sound trigger module (5V).
 
 ***
 
