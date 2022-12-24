@@ -1,7 +1,7 @@
 # Online AAD with a Cost-efficient System
 
 This system is a cost-effective, open-source device for online auditory attention detection and consists of an EEG acquisition module, a sound player module and a sound trigger module.
-This instruction contains information on how to implement CEDA. 
+This instruction contains information on how to implement the system. 
 
 You can read more about the project here [paper address].
 
