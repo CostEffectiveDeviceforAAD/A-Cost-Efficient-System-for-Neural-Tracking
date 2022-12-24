@@ -3,7 +3,6 @@
 This system is a cost-effective, open-source device for online auditory attention detection and consists of an EEG acquisition module, a sound player module and a sound trigger module.
 This instruction contains information on how to implement the system. 
 
-You can read more about the project here [paper address].
 
 ## Essential Modules
 <img width="60%" src="https://user-images.githubusercontent.com/85104167/180901773-ea07b295-08eb-4860-a95a-27ae7a6ec707.jpg"/>
