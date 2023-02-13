@@ -7,17 +7,8 @@ from scipy.stats import stats
 import numpy as np
 from pylab import *
 
-def butter_bandpass_filter(data, lowcut, highcut, fs, order):   # IIR
-    nyq = 0.5 * fs
-    low = lowcut/nyq
-    high = highcut/nyq
-    b, a = signal.butter(order, [low, high], btype='band')
-    y = filtfilt(b, a, data)
-    return y
-
 def FIR_filter(data, lowcut, highcut, fs, order):   # FIR
-    nyq = 0.5 * fs
-    b = signal.firwin(order, [lowcut, highcut], window='hamming', pass_zero='bandpass', nyq = nyq)   # filter design
+    b = signal.firwin(order, [lowcut, highcut], window='hamming', pass_zero='bandpass', fs = fs)   # filter design
     y = filtfilt(b, 1.0, data)
     return y
 
