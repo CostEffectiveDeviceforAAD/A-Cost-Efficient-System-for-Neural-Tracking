@@ -17,8 +17,6 @@ from EMA import *
 #################################################################################################
 # set info
 subject = '001'             # Subject number
-original = 'R'   # or L     # First attention direction
-opposite = 'L'   # or R     # opposite direction
 arduino = 'COM3'            # Arduino serial port number
 cyton = 'COM11'             # OpenBCI board Bluetooth port number
 path = 'C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/Python'          # Base Directory
