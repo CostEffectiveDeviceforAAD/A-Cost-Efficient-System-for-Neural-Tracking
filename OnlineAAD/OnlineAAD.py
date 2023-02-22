@@ -19,7 +19,7 @@ from EMA import *
 subject = '001'             # Subject number
 arduino = 'COM3'            # Arduino serial port number
 cyton = 'COM11'             # OpenBCI board Bluetooth port number
-path = 'C:/Users/LeeJiWon/Desktop/OpenBCI/AAD/Python'          # Base Directory
+path = 'C:/Users/'          # Base Directory
 
 # Connection
 port = serial.Serial(arduino, 9600)     # Connect to port of arduino
