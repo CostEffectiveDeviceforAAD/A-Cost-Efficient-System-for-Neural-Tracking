@@ -8,9 +8,9 @@ subject = 7
 % subject = 5
 
 %%
-all = mean(Acc(15:end));
-fix = mean(Acc(15:26));
-swi = mean(Acc(27:end));
+all = mean(Acc);
+fix = mean(Acc(1:12));
+swi = mean(Acc(13:end));
 
 %% Behavior
 file = strcat('Behavior',sub, '.mat');
@@ -320,17 +320,17 @@ legend('Real-time', 'SMA', 'WMA', 'EMA')
 
 %% fre 2-8
 
-all_28 = [ 58.56 60.05 72.69 70.92 56.11 56.39 51.09];
-fix_28 = [ 57.79 63.95 74.09 71.74 54.35 61.23 48.37];
-swi_28 = [ 60.87 48.37 68.48 68.48 61.41 41.85 59.24];
+all_28 = [ 58.56 60.05 72.69 70.92 56.11 56.39 51.09,53.13];
+fix_28 = [ 57.79 63.95 74.09 71.74 54.35 61.23 48.37,50.91];
+swi_28 = [ 60.87 48.37 68.48 68.48 61.41 41.85 59.24,59.78];
 
 mean_all_28 = mean(all_28);
 mean_fix_28 = mean(fix_28);
 mean_swi_28 = mean(swi_28);
 
-std_all_28 = std(all_28);
-std_fix_28 = std(fix_28);
-std_swi_28 = std(swi_28);
+std_all_28 = std(all_28)/sqrt(length(all_28));
+std_fix_28 = std(fix_28)/sqrt(length(fix_28));
+std_swi_28 = std(swi_28)/sqrt(length(swi_28));
 
 %% 3 condition
 % real-time
@@ -361,6 +361,104 @@ ylabel('Accuracy(%)');
 set(gcf, 'color', 'white'); hold off
 hleg = legend(b,'Real-time', 'High-freq', 'EMA', 'Location', 'southeast');
 set(hleg, 'FontSize', 12);
+
+
+%% all/fix /swi - real/ma
+
+% real data
+real_all = [67.39 67.53 70.11 88.32 63.18 60.05 73.51, 76.09];
+real_all_m = mean(real_all);
+real_all_std = std(real_all);
+real_all_se = std(real_all)/sqrt(length(real_all));
+
+real_fix = [ 68.12 69.02 72.83 91.85 63.59 62.50 76.09,77.54];
+real_fix_m = mean(real_fix);
+real_fix_std = std(real_fix);
+real_fix_se = std(real_fix)/sqrt(length(real_fix));
+
+real_swi = [ 65.22 63.04 61.96 77.72 61.96 52.72 65.76,71.74];
+real_swi_m = mean(real_swi);
+real_swi_std = std(real_swi);
+real_swi_se = std(real_swi)/sqrt(length(real_swi));
+
+% ema
+ema_all = [75 69.7 70.38 95.52 71.06 60.33 73.51,86.55];
+ema_all_m = mean(ema_all);
+ema_all_std = std(ema_all);
+ema_all_se = std(ema_all)/sqrt(length(ema_all));
+
+ema_fix = [75.54 68.12 75.36 96.2 71.92 63.04 74.64,88.95];
+ema_fix_m = mean(ema_fix);
+ema_fix_std = std(ema_fix);
+ema_fix_se = std(ema_fix)/sqrt(length(ema_fix));
+
+ema_swi = [75.37 74.46 55.43 93.48 68.48 52.17 70.11,79.35];
+ema_swi_m = mean(ema_swi);
+ema_swi_std = std(ema_swi);
+ema_swi_se = std(ema_swi)/sqrt(length(ema_swi));
+
+% high
+all_28 = [ 58.56 60.05 72.69 70.92 56.11 56.39 51.09];
+fix_28 = [ 57.79 63.95 74.09 71.74 54.35 61.23 48.37];
+swi_28 = [ 60.87 48.37 68.48 68.48 61.41 41.85 59.24];
+
+all_28_m = mean(all_28);
+fix_28_m = mean(fix_28);
+swi_28_m = mean(swi_28);
+
+s_all_28 = std(all_28);
+s_fix_28 = std(fix_28);
+s_swi_28 = std(swi_28);
+
+%% all/fix /swi - real/ma - plot
+X = categorical({'Overall','Fixed','Switching'});
+X = reordercats(X,{'Overall','Fixed','Switching'});
+
+% X = categorical({'High freq','Low freq'});
+% X = reordercats(X,{'High freq','Low freq'});
+
+re_all = [real_all_m; ema_all_m];
+re_fix = [real_fix_m; ema_fix_m];
+re_swi = [real_swi_m; ema_swi_m;];
+re_se_all = [real_all_se,ema_all_se; real_fix_se,ema_fix_se; real_swi_se,ema_swi_se];
+
+% re_all_std_high = [real_all_m + real_all_std; ema_all_m + ema_all_std];
+% re_fix_std_high = [real_fix_m + real_fix_std; ema_fix_m + ema_fix_std]; 
+% re_swi_std_high = [real_swi_m + real_swi_std; ema_swi_m + ema_swi_std]; 
+% re_all_std_low = [real_all_m - real_all_std; ema_all_m - ema_all_std];
+% re_fix_std_low = [real_fix_m - real_fix_std; ema_fix_m - ema_fix_std]; 
+% re_swi_std_low = [real_swi_m - real_swi_std; ema_swi_m - ema_swi_std]; 
+% std_all_high = [re_all_std_high, re_fix_std_high, re_swi_std_high];
+% std_all_low = [re_all_std_low, re_fix_std_low, re_swi_std_low];
+
+barp = [re_all, re_fix, re_swi];
+
+figure
+b = bar(barp', 'grouped', 'FaceColor', 'flat'); hold on
+b(1).CData(1,:) = [0 0.4470 0.7410]
+b(2).CData(1,:) = [0.9290 0.6940 0.1250]
+b(2).CData(3,:) = [0.9290 0.6940 0.1250]
+b(2).CData(2,:) = [0.9290 0.6940 0.1250]
+
+[ngroups, nbars] = size(barp');
+
+x = nan(nbars, ngroups);
+for i = 1:nbars
+    x(i,:) = b(i).XEndPoints;
+end
+
+% b(1) = bar(X, re_all ,'FaceColor', 'flat');  hold on
+% b(2) = bar(X, re_fix ,'FaceColor', 'flat');
+% b(3) = bar(X(3), re_swi ,'FaceColor', 'flat');
+%plot(X, fre_all, '--ok', 'MarkerFaceColor', [1 1 1] ,'LineWidth', 1);
+errorbar(x', barp', re_se_all, 'k','linestyle','none', 'lineWidth', 1);
+ylim([0 100]);
+ylabel('Accuracy(%)');
+set(gcf, 'color', 'white'); hold off
+hleg = legend(b,'Real-time', 'EMA', 'Location', 'northeast');
+set(hleg, 'FontSize', 12);
+set(gca, 'xticklabel', X);
+
 
 
 

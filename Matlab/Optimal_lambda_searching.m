@@ -4,8 +4,9 @@ clear
 %% load data_AAK
 clear
 %path = 'C:\Users\user\Desktop\hy-kist\OpenBCI\Recording data\'
-path = 'C:\Users\LeeJiWon\Desktop\OpenBCI\Recording data\'
-sub = '0810_YKW'
+path = 'C:\Users\LeeJiWon\Desktop\hykist\AAD\OnlineAAD\Recording data\'
+
+sub = string(2)
 
 file = strcat(path, sub, '\E_', sub, '.mat')
 file2 = strcat(path, sub, '\A_', sub, '.mat')
@@ -37,42 +38,66 @@ for i=1:30
 end
 
 %% Resp preprocessing
-for tr = 1:30
-    raw = EEG{tr};
-    aux = AUX{tr};
-    
-    % Delete Fp1
-    raw(:,8) =[];
-    
-    % find stimuli onset
-    tri = diff(aux(:,2));
-    index = find(tri>0);
-    speech = index(end)+(125*3);
 
-    eeg = raw(speech+1:speech+(125*60),:);
+%path = 'C:\Users\user\Desktop\hy-kist\OpenBCI\Recording data\'
+path = 'C:\Users\LeeJiWon\Desktop\hykist\AAD\OnlineAAD\Recording data\'
+
+% Stim load
+load 'C:\Users\LeeJiWon\Desktop\OpenBCI\AAD\Matlab\Allspeech.mat' 
+%load 'C:\Users\user\Desktop\hy-kist\OpenBCI\AAD\Matlab\Allspeech.mat'
+i=1
+for s = [2,5,6,7,9,10,11]
     
-    RespC{tr} = eeg;
+    sub_eeg = [];
     
-    % rereference
-    for t = 1:15
-        m = mean(eeg(:,t));
-        eeg(:,t) = eeg(:,t) - m;
+    sub = num2str(s);
+
+    file = strcat(path, sub, '\E_', sub, '.mat');
+    file2 = strcat(path, sub, '\A_', sub, '.mat');
+
+    % Resp load
+    load(file);      % EEG ;1by30 cell / timeby channel
+    load(file2);
+
+    for tr = 1:30
+        raw = EEG{tr};
+        aux = AUX{tr};
+
+        % Delete Fp1
+        raw(:,8) =[];
+
+        % find stimuli onset
+        tri = diff(aux(:,2));
+        index = find(tri>0);
+        speech = index(end)+(125*3);
+
+        eeg = raw(speech+1:speech+(125*60),:);
+
+        % rereference
+        for t = 1:15
+            m = mean(eeg(:,t));
+            eeg(:,t) = eeg(:,t) - m;
+        end
+
+        % filter
+        design = designfilt('bandpassfir', 'FilterOrder',601, ...
+            'CutoffFrequency1', 0.5, 'CutoffFrequency2', 8,...
+            'SampleRate', 125);
+
+        eeg = filtfilt(design, eeg);
+
+        % downsample
+        eeg = resample(eeg,64,125);
+
+        % zscore
+        eeg = zscore(eeg);
+
+        sub_eeg = cat(3, sub_eeg, eeg);
     end
-
-    % filter
-    design = designfilt('bandpassfir', 'FilterOrder',601, ...
-        'CutoffFrequency1', 0.5, 'CutoffFrequency2', 8,...
-        'SampleRate', 125);
-
-    eeg = filtfilt(design, eeg);
-
-    % downsample
-    eeg = resample(eeg,64,125);
-
-    % zscore
-    eeg = zscore(eeg);
+    RespC{i} = eeg;
+    DATA{i} = sub_eeg;
+    i = i+1
     
-    RespCC{tr} = eeg;
 end
 
 %% Searching Optimal lambda
@@ -111,7 +136,7 @@ for idx = 1:11
 
         for i = 1:46      % window number
 
-            resp = eeg(125*(i-1)+1 : 125*(i+14), :);
+            resp = eeg(fs*(i-1)+1 : fs*(i+14), :);
             stim_a = stim_L(tr, fs*(i-1)+1 : fs*(i+14))'; 
 
             % Preprocessing
@@ -121,14 +146,14 @@ for idx = 1:11
                 resp(:,t) = resp(:,t) - m;
             end
             % filter
-            resp = filtfilt(design, resp);
+            resp = filtfilt(design, resp');
             % downsample
             resp = resample(resp,64,125);
             % zscore
             resp = zscore(resp);
 
             % Train
-            model = mTRFtrain(stim_a,resp,fs,Dir,tmin,tmax,lambda(idx),'zeropad',1); 
+            model = mTRFtrain(stim_a,resp,fs,Dir,tmin,tmax,10,'zeropad',1); 
 
             % sum model
             model_w = model_w + model.w;
