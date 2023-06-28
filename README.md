@@ -1,6 +1,7 @@
 # A Cost-efficient System for Neural Tracking
 
 The cost-efficicent system is devised for measure neural tracking in real time. It comprises an EEG acquisition module, a sound player module and a sound trigger module (refer to the below diagram).
+
 This instruction provides details on implementing the devised system, and includes the information for performing the real-time Auditory Attention Decoding (AAD) task which is typical auditory task for measuring the neural tracking.
 
 
