@@ -33,7 +33,7 @@ The sound trigger module, which utilizes an Arduino UNO, serves multiple functio
 
 ## Experimental processing
 
-To conduct the AAD experiment, `OnlineAAD_EXP.py` includes data streaming, prepocessing, decoding process with mTRF, visual presentation with Psychopy and communication with arduino. It need 
+To conduct the AAD experiment, `OnlineAAD_EXP.py` includes data streaming, prepocessing, decoding process with mTRF, visual presentation with Psychopy and communication with arduino.
 
 You can run the AAD experiment through `OnlineAAD_EXP.py` along with custom-codes in Sub_Functions file.
 Also, you need to check your arduino, bluetooth COM port number and your directory of files.
