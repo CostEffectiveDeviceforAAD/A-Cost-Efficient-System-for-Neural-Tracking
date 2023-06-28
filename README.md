@@ -39,7 +39,7 @@ To operate it as described above, please upload the following code to the Sound 
 
 ## Experimental processing
 
-The real-time AAD task is performed using `OnlineAAD_EXP.py`. This script includes data streaming, prepocessing, decoding process with mTRF and communication with arduino board.
+The real-time AAD task is performed using `Real-time AAD_EXP.py`. This script includes data streaming, prepocessing, decoding process with mTRF and communication with arduino board.
 
 By utilizing `OnlineAAD_EXP.py` in conjunction with the custom codes provided in the Sub_Functions file, you can execute the real-time AAD task.
 Also, you need to check your arduino, bluetooth COM port number and your directory of files.
