@@ -20,7 +20,7 @@ This instruction contains information on how to implement the system.
   
 
 ### Sound Player Module
-During the experiment, [WAV Trigger](https://github.com/robertsonics/WAV-Trigger-Arduino-Serial-Library) presents sound stimuli by reading the commend from sound trigger module. Sound stimuli are stored in micro SD card. It is supplied 5V power from the sound trigger module (i.e., arduino UNO).
+During the AAD experiment, [WAV Trigger](https://github.com/robertsonics/WAV-Trigger-Arduino-Serial-Library) presents sound stimuli by retrieving commands from the sound trigger module. 
 
 See Arduino Serial Contol Tutorial to operate WAV Trigger
 > 
@@ -28,14 +28,14 @@ See Arduino Serial Contol Tutorial to operate WAV Trigger
 
 
 ### Sound Trigger Module
-The sound trigger module used Arduino UNO. It not only receive the command for trial start from laptop (or PC) via COM port, but also send the command for sound play to the sound player module. Then, to synchronizate between timing information of sound onset and EEG data, the sound trigger module, the sound trigger module provides the sound onset trigger to EEG acquisition module. Refer to following code: `ArduinoTrigger.ino` 
+The sound trigger module, which utilizes an Arduino UNO, serves multiple functions. Firstly, it receives the trial start command from a laptop or PC through the COM port. Secondly, it sends the command for sound playback to the sound player module. Additionally, to synchronize the timing information of sound onset with EEG data, the sound trigger module generates a sound onset trigger that is sent to the EEG acquisition module. Refer to following code: `ArduinoTrigger.ino` 
 
 
 ## Experimental processing
 
-To conduct the online AAD experiment, `OnlineAAD_EXP.py` includes data streaming, prepocessing, decoding process with mTRF, visual presentation with Psychopy and communication with arduino. It need 
+To conduct the AAD experiment, `OnlineAAD_EXP.py` includes data streaming, prepocessing, decoding process with mTRF, visual presentation with Psychopy and communication with arduino. It need 
 
-You can run the task through `OnlineAAD_EXP.py` along with custom-codes in Sub_Functions file.
+You can run the AAD experiment through `OnlineAAD_EXP.py` along with custom-codes in Sub_Functions file.
 Also, you need to check your arduino, bluetooth COM port number and your directory of files.
 
 + Other requires
