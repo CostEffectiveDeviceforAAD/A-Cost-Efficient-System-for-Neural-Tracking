@@ -1,6 +1,6 @@
 """"""""""""""""""""""""""""""""""""""""""
-#        A cost-effective device        #
-#           For Online AAD              #
+#        A cost-effective system         #
+#         For rea-time AAD task          #
 """"""""""""""""""""""""""""""""""""""""""
 
 ###### Imports #####
