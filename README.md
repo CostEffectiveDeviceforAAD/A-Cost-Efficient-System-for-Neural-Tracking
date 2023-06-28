@@ -10,7 +10,9 @@ This instruction provides details on implementing the devised system, and includ
 
 ### EEG Acquisition Module
 
- [OpenBCI board](https://openbci.com/?utm_source=google&utm_medium=cpc&utm_campaign=716348300&utm_content=openbci&gclid=Cj0KCQiA-eeMBhCpARIsAAZfxZBwfN8ei8seomxZ255WDN04UvwYix6hzXr-pJoc7drJViXE77-MirIaAnfWEALw_wcB) (Biosensingboard Cyton with Daisy) is used as EEG Acquisition Module. The EEG acquisition module acquire sound onset trigger and EEG signals by 16 channels. Acquired data are sent to PC via bluetooth USB dongle and streamed through the [Brainflow](https://github.com/brainflow-dev/brainflow) which in open-source data acquisition software. In order to carry out the functions mentioned above, you need to proceed with uploading follow code to the EEG Acquisition Module:  `AcquisitionOpenBCI.ino`
+ [OpenBCI board](https://openbci.com/?utm_source=google&utm_medium=cpc&utm_campaign=716348300&utm_content=openbci&gclid=Cj0KCQiA-eeMBhCpARIsAAZfxZBwfN8ei8seomxZ255WDN04UvwYix6hzXr-pJoc7drJViXE77-MirIaAnfWEALw_wcB) (Biosensingboard Cyton with Daisy) is used as EEG Acquisition Module. The EEG acquisition module acquire sound onset trigger and EEG signals by 16 channels. Acquired data are sent to PC via bluetooth USB dongle and streamed through the [Brainflow](https://github.com/brainflow-dev/brainflow) which in open-source data acquisition software. 
+ 
+ In order to carry out the functions mentioned above, you need to proceed with uploading follow code to the EEG Acquisition Module:  `AcquisitionOpenBCI.ino`
 
    The OpenBCI Tutorial and Library can be found on the website provided by OpenBCI Inc., as indicated below.
   > 
@@ -32,6 +34,7 @@ See Arduino Serial Contol Tutorial to operate WAV Trigger
 ### Sound Trigger Module
 For the sound trigger module, an Arduino UNO board was used. 
 Firstly, it receives the trial start command from a laptop or PC through the COM port. Secondly, it sends the command for sound playback to the sound player module. Additionally, to synchronize the timing information of sound onset with EEG data, the sound trigger module generates a sound onset trigger that is sent to the EEG acquisition module. 
+
 To operate it as described above, please upload the following code to the Sound Trigger Module: `ArduinoTrigger.ino` 
 
 ## Experimental processing
