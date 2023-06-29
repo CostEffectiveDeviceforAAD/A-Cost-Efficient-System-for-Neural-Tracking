@@ -30,17 +30,16 @@ aux_channels = board.get_analog_channels(args.board_id)
 srate = board.get_sampling_rate(args.board_id)
 # ----------------------------------- Load Speech segment data -----------------------------------#
 # Load Stimulus data
-allspeech = np.load(path + '/Allspeech.npy')
-# 60 by 3840 / trial by time / 1-30 : Twenty / 31-60 Journey // sampling rate : 64 Hz
-stim_T = allspeech[:30, :]
-stim_J = allspeech[30:, :]
+allspeech = np.load(path + '/YourStimuli.npy')
+stim_att = allspeech[:] # attended speech
+stim_utt = allspeech[:] # unattended speech
 # ---------------------------------------- Parameter Setting -------------------------------------#
 tmin = 0
 tmax = 250          # Time-lag
 Dir = -1            # Backward
 reg_lambda = 10     # Lambda value
 fs = 64             # post sampling rate
-timelag = len(range(int(floor(tmin/100*fs)), int(ceil(tmax/1000*fs)+1)))
+timelag = len(range(int(floor(tmin/1000*fs)), int(ceil(tmax/1000*fs)+1)))
 
 # Ex_int
 Ttrial = 30
@@ -50,10 +49,10 @@ window_Tnum = 60-(width-1)
 ChLen = len(eeg_channels)
 
 # Array
-#corr_T = np.zeros((ChLen,window_Tnum))
-#corr_J = np.zeros((ChLen,window_Tnum))
-EmaCorr_j = np.zeros((ChLen,window_Tnum))
-EmaCorr_t = np.zeros((ChLen,window_Tnum))
+#corr_att = np.zeros((ChLen,window_Tnum))
+#corr_utt = np.zeros((ChLen,window_Tnum))
+EmaCorr_att = np.zeros((ChLen,window_Tnum))
+EmaCorr_utt = np.zeros((ChLen,window_Tnum))
 acc = np.zeros((ChLen, window_Tnum))
 start = []
 end = []
@@ -131,7 +130,7 @@ while tr < Ttrial:
                 # ============================== Train set ==================================#
                 if tr < Train_tr:  # int train
                     # Train decode model
-                    model, tlag, inter = mtrf_train(stim_J[tr:tr + 1, fs * (i):fs * (i) + data_l].T, win.T, fs, Dir,
+                    model, tlag, inter = mtrf_train(stim_att[tr:tr + 1, fs * (i):fs * (i) + data_l].T, win.T, fs, Dir,
                                                             tmin, tmax, reg_lambda)
                     model_w += model
                     inter_w += inter
@@ -144,26 +143,26 @@ while tr < Ttrial:
                 # ============================== Test set ===================================#
                 else:
                     # Reconstruct speech
-                    pred, corr_j, p, mse = mtrf_predict(stim_J[tr:tr + 1, fs * (i):fs * (i) + data_l].T, win.T, Train_model, fs,
+                    pred, corr_att, p, mse = mtrf_predict(stim_att[tr:tr + 1, fs * (i):fs * (i) + data_l].T, win.T, Train_model, fs,
                                                      Dir, tmin, tmax, Train_inter)
-                    pred, corr_t, p, mse = mtrf_predict(stim_T[tr:tr + 1, fs * (i):fs * (i) + data_l].T, win.T, Train_model, fs,
+                    pred, corr_utt, p, mse = mtrf_predict(stim_utt[tr:tr + 1, fs * (i):fs * (i) + data_l].T, win.T, Train_model, fs,
                                                      Dir, tmin, tmax, Train_inter)
                     ''' # without EMA
                     # Compare with both correlation values
-                    if corr_j > corr_t:
+                    if corr_att > corr_utt:
                         acc[tr-14,i] = 1
                     else:
                         acc[tr-14,i] = 0
 
                     # Stock correlation value per window(i)
-                    corr_J[tr-14,i] = np.array(corr_j)
-                    corr_T[tr-14,i] = np.array(corr_t)
+                    corr_att[tr-14,i] = np.array(corr_att)
+                    corr_utt[tr-14,i] = np.array(corr_utt)
                     '''
                     # Exponential Moving Average
-                    EmaCorr_j, EmaCorr_t = EMA(corr_j, corr_t, EmaCorr_j, EmaCorr_t, i, tr)
+                    EmaCorr_att, EmaCorr_utt = EMA(corr_att, corr_utt, EmaCorr_att, EmaCorr_utt, i, tr)
 
                     # Compare with both correlation values
-                    if EmaCorr_j[tr - Train_tr, i] > EmaCorr_t[tr - Train_tr, i]:
+                    if EmaCorr_att[tr - Train_tr, i] > EmaCorr_utt[tr - Train_tr, i]:
                         acc[tr-Train_tr, i] = 1
                     else:
                         acc[tr-Train_tr, i] = 0
