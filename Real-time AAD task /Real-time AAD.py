@@ -169,14 +169,14 @@ while tr < Ttrial:
                         acc[tr-Train_tr, i] = 0
 
                 # Plus window number
-                i = i + 1
+                i += 1
 
                 # Time count
                 end = time.perf_counter()
                 work = end - start
         # ------------------------ End one trial ------------------------#
         # Format current trial
-        tr = tr + 1
+        tr += 1
         z = 1
 
 #################################################################################################
